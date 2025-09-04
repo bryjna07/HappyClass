@@ -2,6 +2,11 @@
 #
 # gitignore contributors: remember to update Global/Xcode.gitignore, Objective-C.gitignore & Swift.gitignore
 
+# API Key
+HappyClass/Constants/Router
+HappyClass/Constants/API
+HappyClass/Application/Config.xcconfig
+
 ## Build generated
 build/
 DerivedData/
