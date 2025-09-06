@@ -57,7 +57,7 @@ final class LoginViewController: BaseViewController {
             .drive(with: self) { owner, value in
                 if value {
                     if let sceneDelegate = UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate {
-                        let tabBar = TabBarController()
+                        let tabBar = TabBarController(service: owner.viewModel.apiService)
                         sceneDelegate.changeRootViewController(tabBar)
                     }
                 }

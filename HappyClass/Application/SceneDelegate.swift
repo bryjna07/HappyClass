@@ -17,8 +17,16 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window = UIWindow(windowScene: windowScene)
         
         let apiService = APIService()
-        let vm = LoginViewModel(service: apiService)
-        window?.rootViewController = LoginViewController(viewModel: vm)
+        let token = UserDefaultsManager.shared.token
+        
+        if !token.isEmpty {
+            let vc = TabBarController(service: apiService)
+            window?.rootViewController = vc
+        } else {
+            let vm = LoginViewModel(service: apiService)
+            let vc = LoginViewController(viewModel: vm)
+            window?.rootViewController = vc
+        }
         window?.makeKeyAndVisible()
     }
 

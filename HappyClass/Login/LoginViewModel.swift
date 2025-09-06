@@ -12,7 +12,7 @@ import Alamofire
 
 final class LoginViewModel: BaseViewModel {
     
-    private let apiService: APIService
+    let apiService: APIService
     
     struct Input {
         let emailText: Observable<String>
@@ -67,10 +67,10 @@ final class LoginViewModel: BaseViewModel {
                     "password": password
                 ]
                 return self.apiService.fetchData(Router.sesac(.login(param)))
-                    .map { (response: Result<Login, AFError>) -> Bool in
+                    .map { (response: Result<Profile, AFError>) -> Bool in
                         switch response {
                         case .success(let login):
-                            UserDefaultsManager.shared.token = login.accessToken
+                            UserDefaultsManager.shared.token = login.accessToken ?? ""
                             return true
                         case .failure(let error):
                             networkError.accept(error)

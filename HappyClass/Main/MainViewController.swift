@@ -26,6 +26,24 @@ final class MainViewController: BaseViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        navigationItem.title = "클래스 조회"
+        bind()
+    }
+    
+    private func bind() {
         
+        let input = MainViewModel.Input(viewDidLoad: Observable.just(()))
+        
+        let output = viewModel.transform(input: input)
+        
+        output.courses
+            .drive(mainView.tableView.rx.items(
+                cellIdentifier: MainCell.identifier,
+                cellType: MainCell.self)
+            ) { (row, element, cell) in
+                cell.configure(with: element)
+            }
+            .disposed(by: disposeBag)
+
     }
 }

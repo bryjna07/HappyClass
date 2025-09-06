@@ -10,6 +10,17 @@ import Then
 
 final class TabBarController: UITabBarController {
     
+    private let apiService: APIService
+    
+    init(service: APIService) {
+        self.apiService = service
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupTabBar()
@@ -17,8 +28,6 @@ final class TabBarController: UITabBarController {
     }
     
     private func setupViewControllers() {
-        
-        let apiService = APIService()
         
         let mainVM = MainViewModel(service: apiService)
         let mainVC = MainViewController(viewModel: mainVM)
@@ -58,11 +67,11 @@ final class TabBarController: UITabBarController {
         appearance.configureWithOpaqueBackground()
         appearance.backgroundColor = .white
         
-        appearance.stackedLayoutAppearance.selected.iconColor = .gray
-        appearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: UIColor.gray]
+        appearance.stackedLayoutAppearance.selected.iconColor = .navy
+        appearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: UIColor.navy]
         
-        appearance.stackedLayoutAppearance.normal.iconColor = .black
-        appearance.stackedLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: UIColor.black]
+        appearance.stackedLayoutAppearance.normal.iconColor = .mainGray
+        appearance.stackedLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: UIColor.mainGray]
         
         UITabBar.appearance().standardAppearance = appearance
         UITabBar.appearance().scrollEdgeAppearance = appearance

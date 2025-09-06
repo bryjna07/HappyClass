@@ -8,12 +8,12 @@
 import Foundation
 
 // 로그인 응답 모델
-struct Login: Decodable {
+struct Profile: Decodable {
     let userId: String
     let nick: String
-    let email: String
+    let email: String?
     let profileImage: String?
-    let accessToken: String
+    let accessToken: String?
     
     enum CodingKeys: String, CodingKey {
         case userId = "user_id"
