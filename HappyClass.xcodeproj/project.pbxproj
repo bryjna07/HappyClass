@@ -238,6 +238,8 @@
 		};
 		17B87E922E691690001CB8DC /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 17B87E7E2E69168E001CB8DC /* HappyClass */;
+			baseConfigurationReferenceRelativePath = Application/Config.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
