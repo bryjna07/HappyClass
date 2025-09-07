@@ -36,4 +36,13 @@ struct Courses: Decodable {
         case isLiked = "is_liked"
         case creator
     }
+    
+    var dicountPercent: String {
+        guard let price, let salePrice else {
+            return ""
+        }
+        let num = 1.0 - (Double(salePrice) / Double(price))
+        let percent = Int((num * 100).rounded())
+        return "\(percent)%"
+    }
 }

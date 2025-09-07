@@ -40,10 +40,23 @@ final class MainCell: BaseTableViewCell {
         $0.textColor = .black
     }
     
+    private let salePriceLabel = UILabel().then {
+        $0.font = .boldSystemFont(ofSize: 16)
+        $0.textColor = .black
+    }
+    
+    private let discountLabel = UILabel().then {
+        $0.font = .boldSystemFont(ofSize: 16)
+        $0.textColor = .mainOrange
+    }
+    
     override func prepareForReuse() {
         super.prepareForReuse()
         mainImageView.cancelDownload()
         mainImageView.image = nil
+        priceLabel.attributedText = nil
+        salePriceLabel.isHidden = true
+        discountLabel.isHidden = true
     }
     
 }
@@ -56,7 +69,7 @@ extension MainCell {
             nameLabel,
             categoryLabel,
             descriptionLabel,
-            priceLabel
+            priceLabel, salePriceLabel, discountLabel
         ].forEach {
             contentView.addSubview($0)
         }
@@ -91,9 +104,26 @@ extension MainCell {
         
         priceLabel.snp.makeConstraints {
             $0.top.equalTo(descriptionLabel.snp.bottom).offset(8)
-            $0.horizontalEdges.equalToSuperview().inset(16)
+            $0.leading.equalToSuperview().inset(16)
             $0.bottom.equalToSuperview().inset(8)
         }
+        
+        salePriceLabel.snp.makeConstraints {
+            $0.top.equalTo(descriptionLabel.snp.bottom).offset(8)
+            $0.leading.equalTo(priceLabel.snp.trailing).offset(8)
+            $0.bottom.equalToSuperview().inset(8)
+        }
+        
+        discountLabel.snp.makeConstraints {
+            $0.top.equalTo(descriptionLabel.snp.bottom).offset(8)
+            $0.leading.equalTo(salePriceLabel.snp.trailing).offset(8)
+            $0.bottom.equalToSuperview().inset(8)
+        }
+    }
+    
+    override func configureView() {
+        salePriceLabel.isHidden = true
+        discountLabel.isHidden = true
     }
     
     func configure(with data: Courses) {
@@ -110,7 +140,27 @@ extension MainCell {
         descriptionLabel.text = data.description
         
         if let price = data.price {
-            priceLabel.text = "\(price.formatted())원"
+            if let sale = data.salePrice {
+                let text = "\(price.formatted())원"
+                let attribute = NSMutableAttributedString(string: text)
+                attribute.addAttributes([
+                    .strikethroughStyle: NSUnderlineStyle.single.rawValue,
+                    .foregroundColor: UIColor.mainGray
+                ], range: NSRange(location: 0, length: attribute.length))
+                priceLabel.attributedText = attribute
+                
+                salePriceLabel.isHidden = false
+                salePriceLabel.text = "\(sale.formatted())원"
+                
+                discountLabel.isHidden = false
+                discountLabel.text = data.dicountPercent
+                
+            } else {
+                priceLabel.text = "\(price.formatted())원"
+            }
+        } else {
+            priceLabel.text = "무료"
+            priceLabel.textColor = .mainOrange
         }
     }
 }
