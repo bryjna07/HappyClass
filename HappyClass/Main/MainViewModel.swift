@@ -18,6 +18,7 @@ final class MainViewModel: BaseViewModel {
     struct Input {
         let viewDidLoad: Observable<Void>
         let selectedCategories: Observable<Set<Category>>
+        let selectedSort: Observable<Sort>
     }
     
     struct Output {
@@ -60,12 +61,25 @@ final class MainViewModel: BaseViewModel {
             let categoryNums = categories.map { $0.rawValue }
             return items.filter { categoryNums.contains($0.category) }
         }
+        
+        let sorted = Observable.combineLatest(
+            filtered,
+            input.selectedSort) { items, sort in
+                switch sort {
+                case .latest:
+                    return items
+                case .price:
+                    return items.sorted {
+                        ($0.price ?? 0) > ($1.price ?? 0)
+                    }
+                }
+            }
 
-        let amountText = filtered
+        let amountText = sorted
             .map { "\($0.count.formatted())개" }
 
         return Output(
-            courses: filtered.asDriver(onErrorJustReturn: []),
+            courses: sorted.asDriver(onErrorJustReturn: []),
             errorMessage: errorText.asDriver(onErrorDriveWith: .empty()),
             amountText: amountText.asDriver(onErrorJustReturn: "0개")
         )

@@ -35,8 +35,12 @@ final class MainView: BaseView {
     }
     
     let sortButton = UIButton().then {
-        $0.setTitle("최신순", for: .normal)
-        $0.setTitleColor(.mainOrange, for: .normal)
+        var config = UIButton.Configuration.plain()
+        config.image = UIImage(systemName: "line.3.horizontal")
+        config.imagePlacement = .trailing
+        config.baseForegroundColor = .mainOrange
+        config.contentInsets = .init(top: 0, leading: 0, bottom: 0, trailing: 0)
+        $0.configuration = config
     }
     
     let tableView = UITableView().then {

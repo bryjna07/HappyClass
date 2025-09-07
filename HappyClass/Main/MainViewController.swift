@@ -70,10 +70,26 @@ final class MainViewController: BaseViewController {
                 }
             }
             .disposed(by: disposeBag)
+        
+        // 뷰모델로 넘겨줄 Sort
+        let sortRelay = BehaviorRelay<Sort>(value: .latest)
+
+        mainView.sortButton.rx.tap
+            .withLatestFrom(sortRelay)
+            .map { $0 == .latest ? .price : .latest }
+            .bind(to: sortRelay)
+            .disposed(by: disposeBag)
+
+        // Sort 버튼 UI 바인딩
+        sortRelay
+            .map { $0.title }
+            .bind(to: mainView.sortButton.rx.title())
+            .disposed(by: disposeBag)
 
         let input = MainViewModel.Input(
             viewDidLoad: Observable.just(()),
-            selectedCategories: selectedCategories.asObservable()
+            selectedCategories: selectedCategories.asObservable(),
+            selectedSort: sortRelay.asObservable()
         )
         
         let output = viewModel.transform(input: input)
