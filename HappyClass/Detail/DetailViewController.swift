@@ -8,6 +8,7 @@
 import UIKit
 import RxSwift
 import RxCocoa
+import Toast
 
 final class DetailViewController: BaseViewController {
     
@@ -48,5 +49,21 @@ final class DetailViewController: BaseViewController {
                 cell.imageView.setKFImage(path: element)
             }
             .disposed(by: disposeBag)
+        
+        output.commentCount
+            .drive(with: self) { owner, value in
+                owner.detailView.configureCommentButton(count: value)
+            }
+            .disposed(by: disposeBag)
+        
+        detailView.commentButton.rx.tap
+            .withLatestFrom(output.commentList)
+            .bind(with: self) { owner, comments in
+                let vm = CommentListViewModel(service: owner.viewModel.apiService, data: comments, title: owner.navigationItem.title)
+                let vc = CommentListViewController(viewModel: vm)
+                owner.navigationController?.pushViewController(vc, animated: true)
+            }
+            .disposed(by: disposeBag)
+        
     }
 }

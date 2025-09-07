@@ -71,6 +71,7 @@ final class LoginViewModel: BaseViewModel {
                         switch response {
                         case .success(let login):
                             UserDefaultsManager.shared.token = login.accessToken ?? ""
+                            UserDefaultsManager.shared.id = login.userId
                             return true
                         case .failure(let error):
                             networkError.accept(error)

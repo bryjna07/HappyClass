@@ -14,4 +14,6 @@ final class UserDefaultsManager {
     @UserDefault(key: "token", defaultValue: "")
     var token: String
     
+    @UserDefault(key: "id", defaultValue: "")
+    var id: String
 }

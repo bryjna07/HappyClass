@@ -102,15 +102,13 @@ final class DetailView: BaseView {
         $0.backgroundColor = .disSelected
     }
     
-    private let likeButton = UIButton().then {
+    let likeButton = UIButton().then {
         var config = UIButton.Configuration.plain()
-        config.image = UIImage(systemName: "heart")
         config.contentInsets = .init(top: 0, leading: 0, bottom: 0, trailing: 0)
-        config.baseForegroundColor = .mainGray
         $0.configuration = config
     }
     
-    private let commentButton = UIButton().then {
+    let commentButton = UIButton().then {
         $0.setTitle("댓글보기", for: .normal)
         $0.backgroundColor = .disSelected
     }
@@ -292,4 +290,9 @@ extension DetailView {
         likeButton.tintColor = color
     }
     
+    func configureCommentButton(count: Int) {
+        commentButton.setTitle("댓글보기 (\(count))", for: .normal)
+        commentButton.backgroundColor = (count == 0) ? .mainGray : .mainOrange
+        commentButton.isEnabled = (count == 0) ? false : true
+    }
 }

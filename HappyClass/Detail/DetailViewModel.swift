@@ -12,7 +12,7 @@ import Alamofire
 
 final class DetailViewModel: BaseViewModel {
     
-    private let apiService: APIService
+    let apiService: APIService
     private let classId: String
     private let disposeBag = DisposeBag()
     
@@ -23,6 +23,8 @@ final class DetailViewModel: BaseViewModel {
     struct Output {
         let data: Driver<Course>
         let imageList: Driver<[String]>
+        let commentCount: Driver<Int>
+        let commentList: Driver<[Comment]>
     }
     
     init(service: APIService, classId: String) {
@@ -34,6 +36,8 @@ final class DetailViewModel: BaseViewModel {
         
         let data = PublishRelay<Course>()
         let imageList = BehaviorRelay<[String]>(value: [])
+        let commentCount = BehaviorRelay<Int>(value: 0)
+        let commentList = BehaviorRelay<[Comment]>(value: [])
         
         input.viewDidLoad
             .flatMap { [weak self] _ -> Single<Result<Course, AFError>> in
@@ -53,9 +57,27 @@ final class DetailViewModel: BaseViewModel {
                 }
             }
             .disposed(by: disposeBag)
+        
+        input.viewDidLoad
+            .flatMap { [weak self] _ -> Single<Result<CommentInfo, AFError>> in
+                guard let self else { return .never() }
+                return self.apiService.fetchData(Router.sesac(.readComments(self.classId)))
+            }
+            .subscribe(with: self) { owner, result in
+                switch result {
+                case .success(let data):
+                    commentCount.accept(data.data.count)
+                    commentList.accept(data.data)
+                case .failure(let error):
+                    print(error.localizedDescription)
+                }
+            }
+            .disposed(by: disposeBag)
 
-                
         return Output(data: data.asDriver(onErrorDriveWith: .empty()),
-                      imageList: imageList.asDriver())
+                      imageList: imageList.asDriver(),
+                      commentCount: commentCount.asDriver(),
+                      commentList: commentList.asDriver()
+        )
     }
 }
