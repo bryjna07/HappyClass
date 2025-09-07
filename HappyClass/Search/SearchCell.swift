@@ -1,5 +1,5 @@
 //
-//  MainCell.swift
+//  SearchCell.swift
 //  HappyClass
 //
 //  Created by YoungJin on 9/6/25.
@@ -11,32 +11,24 @@ import SnapKit
 import Kingfisher
 import RxSwift
 
-final class MainCell: BaseTableViewCell {
+final class SearchCell: BaseTableViewCell {
     
     var disposeBag = DisposeBag()
-    
+
     private let mainImageView = UIImageView().then {
         $0.contentMode = .scaleAspectFill
         $0.layer.cornerRadius = 8
         $0.clipsToBounds = true
     }
     
-    let likeButton = UIButton().then {
-        $0.setImage(.likeButton, for: .normal)
-    }
+    private let categoryLabel = CategoryLabel()
     
     private let nameLabel = UILabel().then {
         $0.font = .boldSystemFont(ofSize: 16)
         $0.textColor = .black
     }
     
-    private let categoryLabel = CategoryLabel()
-
-    private let descriptionLabel = UILabel().then {
-        $0.font = .systemFont(ofSize: 14)
-        $0.textColor = .mainGray
-        $0.numberOfLines = 1
-    }
+    let likeButton = UIButton()
     
     private let priceLabel = UILabel().then {
         $0.font = .boldSystemFont(ofSize: 16)
@@ -65,14 +57,13 @@ final class MainCell: BaseTableViewCell {
     
 }
 
-extension MainCell {
+extension SearchCell {
     override func configureHierarchy() {
         [
             mainImageView,
             likeButton,
             nameLabel,
             categoryLabel,
-            descriptionLabel,
             priceLabel, salePriceLabel, discountLabel
         ].forEach {
             contentView.addSubview($0)
@@ -81,47 +72,40 @@ extension MainCell {
     
     override func configureLayout() {
         mainImageView.snp.makeConstraints {
-            $0.top.equalToSuperview().inset(8)
-            $0.horizontalEdges.equalToSuperview().inset(16)
-            $0.height.equalTo(mainImageView.snp.width).multipliedBy(9.0/16.0)
+            $0.verticalEdges.equalToSuperview().inset(8)
+            $0.leading.equalToSuperview().inset(16)
+            $0.width.equalTo(mainImageView.snp.height).multipliedBy(1.3/1.0)
         }
         
         likeButton.snp.makeConstraints {
-            $0.top.trailing.equalToSuperview().inset(32)
-        }
-        
-        nameLabel.snp.makeConstraints {
-            $0.top.equalTo(mainImageView.snp.bottom).offset(8)
-            $0.leading.equalToSuperview().inset(16)
+            $0.trailing.equalToSuperview().inset(16)
+            $0.centerY.equalToSuperview()
         }
         
         categoryLabel.snp.makeConstraints {
-            $0.centerY.equalTo(nameLabel)
-            $0.leading.equalTo(nameLabel.snp.trailing).offset(4)
-            $0.trailing.lessThanOrEqualToSuperview().inset(16)
+            $0.top.equalToSuperview().inset(8)
+            $0.leading.equalTo(mainImageView.snp.trailing).offset(8)
         }
         
-        descriptionLabel.snp.makeConstraints {
-            $0.top.equalTo(nameLabel.snp.bottom).offset(8)
-            $0.horizontalEdges.equalToSuperview().inset(16)
+        nameLabel.snp.makeConstraints {
+            $0.top.equalTo(categoryLabel.snp.bottom).offset(4)
+            $0.leading.equalTo(mainImageView.snp.trailing).offset(8)
+            $0.trailing.equalToSuperview().inset(16)
         }
-        
+      
         priceLabel.snp.makeConstraints {
-            $0.top.equalTo(descriptionLabel.snp.bottom).offset(8)
-            $0.leading.equalToSuperview().inset(16)
-            $0.bottom.equalToSuperview().inset(8)
+            $0.bottom.equalTo(salePriceLabel.snp.top).offset(-4)
+            $0.leading.equalTo(mainImageView.snp.trailing).offset(8)
         }
         
         salePriceLabel.snp.makeConstraints {
-            $0.top.equalTo(descriptionLabel.snp.bottom).offset(8)
-            $0.leading.equalTo(priceLabel.snp.trailing).offset(8)
             $0.bottom.equalToSuperview().inset(8)
+            $0.leading.equalTo(mainImageView.snp.trailing).offset(8)
         }
         
         discountLabel.snp.makeConstraints {
-            $0.top.equalTo(descriptionLabel.snp.bottom).offset(8)
-            $0.leading.equalTo(salePriceLabel.snp.trailing).offset(8)
             $0.bottom.equalToSuperview().inset(8)
+            $0.leading.equalTo(salePriceLabel.snp.trailing).offset(8)
         }
     }
     
@@ -144,8 +128,6 @@ extension MainCell {
         nameLabel.text = data.title
         
         categoryLabel.text = Category(rawValue: data.category)?.name
-        
-        descriptionLabel.text = data.description
         
         if let price = data.price {
             if let sale = data.salePrice {

@@ -9,17 +9,18 @@ import Foundation
 
 // 클래스 응답 모델
 struct CoursesInfo: Decodable {
-    let data: [Courses]
+    let data: [Course]
 }
 
-struct Courses: Decodable {
+struct Course: Decodable {
     let classId: String
     let category: Int
     let title: String
     let description: String
     let price: Int?
     let salePrice: Int?
-    let imageURL: String
+    let imageURL: String?
+    let imageURLS: [String]?
     let createdAt: String
     let isLiked: Bool
     let creator: Profile
@@ -32,6 +33,7 @@ struct Courses: Decodable {
         case price
         case salePrice = "sale_price"
         case imageURL = "image_url"
+        case imageURLS = "image_urls"
         case createdAt = "created_at"
         case isLiked = "is_liked"
         case creator

@@ -1,17 +1,19 @@
 //
-//  SearchView.swift
+//  SettingView.swift
 //  HappyClass
 //
 //  Created by YoungJin on 9/5/25.
 //
 
-import Foundation
+import UIKit
+import Then
+import SnapKit
 
-final class SearchView: BaseView {
+final class SettingView: BaseView {
     
 }
 
-extension SearchView {
+extension SettingView {
     
     override func configureHierarchy() {
 //        [

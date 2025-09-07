@@ -19,10 +19,11 @@ final class MainViewModel: BaseViewModel {
         let viewDidLoad: Observable<Void>
         let selectedCategories: Observable<Set<Category>>
         let selectedSort: Observable<Sort>
+        let likeTap: Observable<(String, Bool)>
     }
     
     struct Output {
-        let courses: Driver<[Courses]>
+        let courses: Driver<[Course]>
         let errorMessage: Driver<String>
         let amountText: Driver<String>
     }
@@ -34,12 +35,12 @@ final class MainViewModel: BaseViewModel {
     func transform(input: Input) -> Output {
         
         let errorText = PublishRelay<String>()
-        let list = BehaviorRelay<[Courses]>(value: [])
+        let list = BehaviorRelay<[Course]>(value: [])
         
         input.viewDidLoad
             .flatMap { [weak self] _ -> Single<Result<CoursesInfo, AFError>> in
                 guard let self else { return .never() }
-                return self.apiService.fetchData(Router.sesac(.courses(nil)))
+                return self.apiService.fetchData(Router.sesac(.courses))
             }
             .subscribe(with: self) { owner, response in
                 switch response {
@@ -77,6 +78,40 @@ final class MainViewModel: BaseViewModel {
 
         let amountText = sorted
             .map { "\($0.count.formatted())개" }
+        
+        // 좋아요 버튼 업데이트
+        input.likeTap
+            .flatMapLatest { [weak self] (id, bool) -> Single<(String, Result<ResponseMessage, AFError>)> in
+                guard let self else { return .never() }
+                return self.apiService
+                    .fetchData(Router.sesac(.like(id, bool)))
+                    .map { (id, $0) }
+            }
+            .flatMapLatest { [weak self] (id, likeResult) -> Single<(String, Result<Course, AFError>)> in
+                guard let self else { return .never() }
+                switch likeResult {
+                case .success:
+                    return self.apiService
+                        .fetchData(Router.sesac(.courseDetail(id)))
+                        .map { (id, $0) }
+                case .failure(let err):
+                    errorText.accept(err.localizedDescription)
+                    return .never()
+                }
+            }
+            .subscribe(onNext: { (id, result) in
+                switch result {
+                case .success(let course):
+                        var coursesList = list.value
+                        if let index = coursesList.firstIndex(where: { $0.classId == id }) {
+                            coursesList[index] = course
+                            list.accept(coursesList)
+                        }
+                case .failure(let error):
+                    errorText.accept(error.localizedDescription)
+                }
+            })
+            .disposed(by: disposeBag)
 
         return Output(
             courses: sorted.asDriver(onErrorJustReturn: []),

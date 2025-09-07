@@ -13,13 +13,16 @@ import Alamofire
 final class SearchViewModel: BaseViewModel {
     
     private let apiService: APIService
+    private let disposeBag = DisposeBag()
     
     struct Input {
-        
+        let searchButtonTap: Observable<String>
+        let likeTap: Observable<(String, Bool)>
     }
     
     struct Output {
-        
+        let list: Driver<[Course]>
+        let errorMessage: Driver<String>
     }
     
     init(service: APIService) {
@@ -28,6 +31,62 @@ final class SearchViewModel: BaseViewModel {
     
     func transform(input: Input) -> Output {
         
-        return Output()
+        let errorText = PublishRelay<String>()
+        let list = BehaviorRelay<[Course]>(value: [])
+        
+        input.searchButtonTap
+            .map {
+                $0.trimmingCharacters(in: .whitespacesAndNewlines)
+            }
+            .filter { !$0.isEmpty }
+            .distinctUntilChanged()
+            .flatMap { [weak self] text -> Single<Result<CoursesInfo, AFError>> in
+                guard let self else { return .never() }
+                return self.apiService.fetchData(Router.sesac(.search(text)))
+            }
+            .subscribe(with: self) { owner, response in
+                switch response {
+                case .success(let data):
+                    list.accept(data.data)
+                case .failure(let error):
+                    errorText.accept(error.localizedDescription)
+                }
+            }
+            .disposed(by: disposeBag)
+        
+        input.likeTap
+            .flatMapLatest { [weak self] (id, bool) -> Single<(String, Result<ResponseMessage, AFError>)> in
+                guard let self else { return .never() }
+                return self.apiService
+                    .fetchData(Router.sesac(.like(id, bool)))
+                    .map { (id, $0) }
+            }
+            .flatMapLatest { [weak self] (id, likeResult) -> Single<(String, Result<Course, AFError>)> in
+                guard let self else { return .never() }
+                switch likeResult {
+                case .success:
+                    return self.apiService
+                        .fetchData(Router.sesac(.courseDetail(id)))
+                        .map { (id, $0) }
+                case .failure(let err):
+                    errorText.accept(err.localizedDescription)
+                    return .never()
+                }
+            }
+            .subscribe(onNext: { (id, result) in
+                switch result {
+                case .success(let course):
+                        var coursesList = list.value
+                        if let index = coursesList.firstIndex(where: { $0.classId == id }) {
+                            coursesList[index] = course
+                            list.accept(coursesList)
+                        }
+                case .failure(let error):
+                    errorText.accept(error.localizedDescription)
+                }
+            })
+            .disposed(by: disposeBag)
+
+        return Output(list: list.asDriver(), errorMessage: errorText.asDriver(onErrorDriveWith: .empty()))
     }
 }

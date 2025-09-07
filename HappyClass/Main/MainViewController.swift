@@ -41,6 +41,9 @@ final class MainViewController: BaseViewController {
         
         // 뷰모델로 넘겨줄 카테고리
         let selectedCategories = BehaviorRelay<Set<Category>>(value: [])
+        
+        // 좋아요 버튼탭
+        let likeTap = PublishRelay<(String, Bool)>()
 
         categoryTap
             .subscribe(with: self) { owner, category in
@@ -89,7 +92,8 @@ final class MainViewController: BaseViewController {
         let input = MainViewModel.Input(
             viewDidLoad: Observable.just(()),
             selectedCategories: selectedCategories.asObservable(),
-            selectedSort: sortRelay.asObservable()
+            selectedSort: sortRelay.asObservable(),
+            likeTap: likeTap.asObservable()
         )
         
         let output = viewModel.transform(input: input)
@@ -100,6 +104,13 @@ final class MainViewController: BaseViewController {
                 cellIdentifier: MainCell.identifier,
                 cellType: MainCell.self)) { (row, element, cell) in
                     cell.configure(with: element)
+                    
+                    cell.likeButton.rx.tap
+                        .map {
+                            (element.classId, !element.isLiked)
+                        }
+                        .bind(to: likeTap)
+                        .disposed(by: cell.disposeBag)
             }
             .disposed(by: disposeBag)
 
