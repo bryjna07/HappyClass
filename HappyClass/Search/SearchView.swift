@@ -28,7 +28,6 @@ final class SearchView: BaseView {
         $0.register(SearchCell.self, forCellReuseIdentifier: SearchCell.identifier)
         $0.rowHeight = 120
         $0.backgroundColor = .white
-        $0.allowsSelection = false
         $0.showsVerticalScrollIndicator = false
     }
     

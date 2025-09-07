@@ -126,6 +126,7 @@ extension MainCell {
     }
     
     override func configureView() {
+        super.configureView()
         salePriceLabel.isHidden = true
         discountLabel.isHidden = true
     }
@@ -149,7 +150,7 @@ extension MainCell {
         
         if let price = data.price {
             if let sale = data.salePrice {
-                let text = "\(price.formatted())원"
+                let text = data.priceString
                 let attribute = NSMutableAttributedString(string: text)
                 attribute.addAttributes([
                     .strikethroughStyle: NSUnderlineStyle.single.rawValue,
@@ -164,10 +165,10 @@ extension MainCell {
                 discountLabel.text = data.dicountPercent
                 
             } else {
-                priceLabel.text = "\(price.formatted())원"
+                priceLabel.text = data.priceString
             }
         } else {
-            priceLabel.text = "무료"
+            priceLabel.text = data.priceString
             priceLabel.textColor = .mainOrange
         }
     }

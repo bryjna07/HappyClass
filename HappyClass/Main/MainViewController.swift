@@ -26,8 +26,16 @@ final class MainViewController: BaseViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        navigationItem.title = "클래스 조회"
         bind()
+    }
+    
+    override func setupNaviBar() {
+        super.setupNaviBar()
+        let titleLabel = UILabel()
+        titleLabel.text = "클래스 조회"
+        titleLabel.font = .boldSystemFont(ofSize: 20)
+        titleLabel.textColor = .navy
+        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: titleLabel)
     }
     
     private func bind() {
@@ -117,6 +125,14 @@ final class MainViewController: BaseViewController {
         // 총 갯수 표시 바인딩
         output.amountText
             .drive(mainView.amountCountLabel.rx.text)
+            .disposed(by: disposeBag)
+        
+        mainView.tableView.rx.modelSelected(Course.self)
+            .bind(with: self) { owner, data in
+                let vm = DetailViewModel(service: owner.viewModel.apiService, classId: data.classId)
+                let vc = DetailViewController(viewModel: vm)
+                owner.navigationController?.pushViewController(vc, animated: true)
+            }
             .disposed(by: disposeBag)
 
     }

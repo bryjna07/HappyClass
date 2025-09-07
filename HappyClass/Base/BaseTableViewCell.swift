@@ -30,5 +30,6 @@ extension BaseTableViewCell: ConfigureUI {
     
     func configureView() {
         backgroundColor = .white
+        selectionStyle = .none
     }
 }

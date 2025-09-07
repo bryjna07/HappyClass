@@ -47,7 +47,6 @@ final class MainView: BaseView {
         $0.register(MainCell.self, forCellReuseIdentifier: MainCell.identifier)
         $0.rowHeight = UITableView.automaticDimension
         $0.backgroundColor = .white
-        $0.allowsSelection = false
         $0.showsVerticalScrollIndicator = false
     }
     

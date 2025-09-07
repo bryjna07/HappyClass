@@ -110,6 +110,7 @@ extension SearchCell {
     }
     
     override func configureView() {
+        super.configureView()
         salePriceLabel.isHidden = true
         discountLabel.isHidden = true
     }

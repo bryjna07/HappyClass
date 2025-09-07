@@ -12,7 +12,7 @@ import Alamofire
 
 final class MainViewModel: BaseViewModel {
     
-    private let apiService: APIService
+    let apiService: APIService
     private let disposeBag = DisposeBag()
     
     struct Input {

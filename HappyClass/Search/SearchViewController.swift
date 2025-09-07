@@ -22,13 +22,21 @@ final class SearchViewController: BaseViewController {
     
     override func loadView() {
         view = searchView
-        navigationItem.title = "클래스 검색"
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         searchView.searchBar.becomeFirstResponder()
         bind()
+    }
+    
+    override func setupNaviBar() {
+        super.setupNaviBar()
+        let titleLabel = UILabel()
+        titleLabel.text = "클래스 검색"
+        titleLabel.font = .boldSystemFont(ofSize: 20)
+        titleLabel.textColor = .navy
+        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: titleLabel)
     }
     
     private func bind() {
@@ -63,6 +71,15 @@ final class SearchViewController: BaseViewController {
                         .disposed(by: cell.disposeBag)
             }
             .disposed(by: disposeBag)
+        
+        searchView.tableView.rx.modelSelected(Course.self)
+            .bind(with: self) { owner, data in
+                let vm = DetailViewModel(service: owner.viewModel.apiService, classId: data.classId)
+                let vc = DetailViewController(viewModel: vm)
+                owner.navigationController?.pushViewController(vc, animated: true)
+            }
+            .disposed(by: disposeBag)
+        
     }
     
 }
