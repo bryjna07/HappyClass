@@ -32,17 +32,64 @@ final class MainViewController: BaseViewController {
     
     private func bind() {
         
-        let input = MainViewModel.Input(viewDidLoad: Observable.just(()))
+        // 카테고리버튼 옵저버블
+        let categoryTap = Observable.merge(
+            mainView.buttons.map { btn in
+                btn.rx.tap.map { btn.category }
+            }
+        )
+        
+        // 뷰모델로 넘겨줄 카테고리
+        let selectedCategories = BehaviorRelay<Set<Category>>(value: [])
+
+        categoryTap
+            .subscribe(with: self) { owner, category in
+                if let category {
+                    var set = selectedCategories.value
+                    if set.contains(category) {
+                        set.remove(category)
+                    } else {
+                        set.insert(category)
+                    }
+                    selectedCategories.accept(set)
+                } else {
+                    selectedCategories.accept([])
+                }
+            }
+            .disposed(by: disposeBag)
+        
+        // 버튼 UI 바인딩
+        selectedCategories
+            .bind(with: self) { owner, categories in
+                owner.mainView.buttons.forEach { button in
+                    if let category = button.category {
+                        button.isSelected = categories.contains(category)
+                    } else {
+                        button.isSelected = categories.isEmpty
+                    }
+                }
+            }
+            .disposed(by: disposeBag)
+
+        let input = MainViewModel.Input(
+            viewDidLoad: Observable.just(()),
+            selectedCategories: selectedCategories.asObservable()
+        )
         
         let output = viewModel.transform(input: input)
-        
+
+        // 테이블뷰 바인딩
         output.courses
             .drive(mainView.tableView.rx.items(
                 cellIdentifier: MainCell.identifier,
-                cellType: MainCell.self)
-            ) { (row, element, cell) in
-                cell.configure(with: element)
+                cellType: MainCell.self)) { (row, element, cell) in
+                    cell.configure(with: element)
             }
+            .disposed(by: disposeBag)
+
+        // 총 갯수 표시 바인딩
+        output.amountText
+            .drive(mainView.amountCountLabel.rx.text)
             .disposed(by: disposeBag)
 
     }

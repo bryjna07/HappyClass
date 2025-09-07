@@ -17,6 +17,7 @@ final class MainViewModel: BaseViewModel {
     
     struct Input {
         let viewDidLoad: Observable<Void>
+        let selectedCategories: Observable<Set<Category>>
     }
     
     struct Output {
@@ -33,7 +34,6 @@ final class MainViewModel: BaseViewModel {
         
         let errorText = PublishRelay<String>()
         let list = BehaviorRelay<[Courses]>(value: [])
-        let amountText = PublishRelay<String>()
         
         input.viewDidLoad
             .flatMap { [weak self] _ -> Single<Result<CoursesInfo, AFError>> in
@@ -50,8 +50,25 @@ final class MainViewModel: BaseViewModel {
             }
             .disposed(by: disposeBag)
 
-        
-        return Output(courses: list.asDriver(), errorMessage: errorText.asDriver(onErrorDriveWith: .empty()), amountText: amountText.asDriver(onErrorDriveWith: .empty()))
+        // 카테고리 선택된 데이터로 필터링
+        let filtered = Observable.combineLatest(
+            list.asObservable(),
+            input.selectedCategories) { items, categories in
+            if categories.isEmpty {
+                return items
+            }
+            let categoryNums = categories.map { $0.rawValue }
+            return items.filter { categoryNums.contains($0.category) }
+        }
+
+        let amountText = filtered
+            .map { "\($0.count.formatted())개" }
+
+        return Output(
+            courses: filtered.asDriver(onErrorJustReturn: []),
+            errorMessage: errorText.asDriver(onErrorDriveWith: .empty()),
+            amountText: amountText.asDriver(onErrorJustReturn: "0개")
+        )
      
     }
 }

@@ -16,20 +16,25 @@ final class MainView: BaseView {
         $0.alwaysBounceHorizontal = true
     }
     
-    private let categoryStack = UIStackView().then {
+    let buttons: [CategoryButton] = {
+        let cats = Category.allCases.map { CategoryButton(category: $0) }
+        let all = CategoryButton()
+        return [all] + cats
+    }()
+    
+    private lazy var categoryStack = UIStackView().then {
         $0.axis = .horizontal
         $0.alignment = .fill
         $0.spacing = 8
         $0.distribution = .fillProportionally
     }
     
-    private let amountCountLabel = UILabel().then {
+    let amountCountLabel = UILabel().then {
         $0.font = .systemFont(ofSize: 14)
         $0.textColor = .black
-        $0.text = "test"
     }
     
-    private let sortButton = UIButton().then {
+    let sortButton = UIButton().then {
         $0.setTitle("최신순", for: .normal)
         $0.setTitleColor(.mainOrange, for: .normal)
     }
@@ -39,6 +44,7 @@ final class MainView: BaseView {
         $0.rowHeight = UITableView.automaticDimension
         $0.backgroundColor = .white
         $0.allowsSelection = false
+        $0.showsVerticalScrollIndicator = false
     }
     
 }
@@ -46,13 +52,7 @@ final class MainView: BaseView {
 extension MainView {
     
     override func configureHierarchy() {
-        
-        var buttons = Category.allCases.map {
-            CategoryButton(title: $0.name)
-        }
-        
-        buttons.insert(CategoryButton(title: "전체"), at: 0)
-        
+
         buttons.forEach {
             categoryStack.addArrangedSubview($0)
         }

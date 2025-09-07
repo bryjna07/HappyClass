@@ -9,10 +9,23 @@ import UIKit
 
 final class CategoryButton: UIButton {
     
-    init(title: String) {
+    let category: Category?
+    
+    override var isSelected: Bool {
+        didSet {
+            changeColor()
+        }
+    }
+    
+    init(category: Category? = nil) {
+        self.category = category
         super.init(frame: .zero)
         var config = UIButton.Configuration.plain()
-        config.title = title
+        if let category {
+            config.title = category.name
+        } else {
+            config.title = "전체"
+        }
         config.contentInsets = .init(top: 4, leading: 8, bottom: 4, trailing: 8)
         config.cornerStyle = .capsule
         config.background.strokeColor = .disSelected
@@ -26,4 +39,10 @@ final class CategoryButton: UIButton {
         fatalError("init(coder:) has not been implemented")
     }
     
+    private func changeColor() {
+        guard var config = configuration else { return }
+        config.baseForegroundColor = isSelected ? .mainOrange : .disSelected
+        config.background.strokeColor = isSelected ? .mainOrange : .disSelected
+        self.configuration = config
+    }
 }
