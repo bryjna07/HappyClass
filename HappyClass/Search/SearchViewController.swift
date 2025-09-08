@@ -56,6 +56,14 @@ final class SearchViewController: BaseViewController {
         )
         
         let output = viewModel.transform(input: input)
+        
+        output.showEmptyView
+            .drive(with: self) { owner, value in
+                owner.searchView.emptyView.isHidden = !value.0
+                owner.searchView.emptyView.label.text = value.1
+            }
+            .disposed(by: disposeBag)
+
 
         output.list
             .drive(searchView.tableView.rx.items(

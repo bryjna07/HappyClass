@@ -52,11 +52,18 @@ final class CommentEditViewController: BaseViewController {
         
         
         let input = CommentEditViewModel.Input(
+            viewDidLoad: .just(()),
             commentText: commentEditView.textView.rx.text.orEmpty.asObservable(),
             rightButtonTap: createButton.rx.tap.asObservable()
         )
         
         let output = viewModel.transform(input: input)
+        
+        if type == .edit {
+            output.commentText
+                .drive(commentEditView.textView.rx.text)
+                .disposed(by: disposeBag)
+        }
         
         output.course
             .drive(with: self) { owner, data in
@@ -85,6 +92,13 @@ final class CommentEditViewController: BaseViewController {
                 } else {
                     owner.view.makeToast("댓글 업데이트 실패", position: .center)
                 }
+            }
+            .disposed(by: disposeBag)
+        
+        commentEditView.textView.rx.text.orEmpty
+            .map { !$0.isEmpty }
+            .bind(with: self) { owner, value in
+                owner.commentEditView.placeholderLabel.isHidden = value
             }
             .disposed(by: disposeBag)
 

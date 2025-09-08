@@ -31,6 +31,8 @@ final class SearchView: BaseView {
         $0.showsVerticalScrollIndicator = false
     }
     
+    let emptyView = EmptyView()
+    
 }
 
 extension SearchView {
@@ -38,7 +40,8 @@ extension SearchView {
     override func configureHierarchy() {
         [
             searchBar,
-            tableView
+            tableView,
+            emptyView
         ].forEach {
             addSubview($0)
         }
@@ -55,5 +58,15 @@ extension SearchView {
             $0.top.equalTo(searchBar.snp.bottom).offset(8)
             $0.bottom.horizontalEdges.equalTo(safeAreaLayoutGuide)
         }
+        
+        emptyView.snp.makeConstraints {
+            $0.top.equalTo(searchBar.snp.bottom).offset(8)
+            $0.bottom.horizontalEdges.equalTo(safeAreaLayoutGuide)
+        }
     }
+    
+    override func configureView() {
+        super.configureView()
+    }
+
 }

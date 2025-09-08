@@ -20,12 +20,14 @@ final class CommentEditViewModel: BaseViewModel {
     
     
     struct Input {
+        let viewDidLoad: Observable<Void>
         let commentText: Observable<String>
         let rightButtonTap: Observable<Void>
     }
     
     struct Output {
         let course: Driver<Course>
+        let commentText: Driver<String>
         let validText: Driver<(String, Bool)>
         let createButtonActive: Driver<Bool>
         let result: Driver<Bool>
@@ -44,7 +46,16 @@ final class CommentEditViewModel: BaseViewModel {
         let validText = BehaviorRelay(value: ("0 / 300", false))
         let reponseResult = PublishRelay<Bool>()
         let buttonActive = BehaviorRelay<Bool>(value: false)
+        let commentText = BehaviorRelay<String>(value: "")
         
+        input.viewDidLoad
+            .bind(with: self) { owner, _ in
+                guard let comment = owner.comment else { return }
+                commentText.accept(comment.content)
+            }
+            .disposed(by: disposeBag)
+        
+
         input.commentText
             .bind(with: self) { owner, text in
                 if text.count >= 2, text.count <= 200 {
@@ -110,6 +121,7 @@ final class CommentEditViewModel: BaseViewModel {
         }
         
         return Output(course: course.asDriver(onErrorDriveWith: .empty()),
+                      commentText: commentText.asDriver(onErrorJustReturn: ""),
                       validText: validText.asDriver(),
                       createButtonActive: buttonActive.asDriver(onErrorDriveWith: .empty()),
                       result: reponseResult.asDriver(onErrorJustReturn: false)

@@ -23,6 +23,7 @@ final class SearchViewModel: BaseViewModel {
     struct Output {
         let list: Driver<[Course]>
         let errorMessage: Driver<String>
+        let showEmptyView: Driver<(Bool, String?)>
     }
     
     init(service: APIService) {
@@ -33,6 +34,7 @@ final class SearchViewModel: BaseViewModel {
         
         let errorText = PublishRelay<String>()
         let list = BehaviorRelay<[Course]>(value: [])
+        let showEmptyView = BehaviorRelay<(Bool, String?)>(value: (true, "원하는 클래스가 있으신가요?"))
         
         input.searchButtonTap
             .map {
@@ -48,6 +50,11 @@ final class SearchViewModel: BaseViewModel {
                 switch response {
                 case .success(let data):
                     list.accept(data.data)
+                    if data.data.isEmpty {
+                        showEmptyView.accept((true, "검색 결과가 없습니다."))
+                    } else {
+                        showEmptyView.accept((false, nil))
+                    }
                 case .failure(let error):
                     errorText.accept(error.localizedDescription)
                 }
@@ -87,6 +94,7 @@ final class SearchViewModel: BaseViewModel {
             })
             .disposed(by: disposeBag)
 
-        return Output(list: list.asDriver(), errorMessage: errorText.asDriver(onErrorDriveWith: .empty()))
+        return Output(list: list.asDriver(), errorMessage: errorText.asDriver(onErrorDriveWith: .empty()),
+                      showEmptyView: showEmptyView.asDriver())
     }
 }
