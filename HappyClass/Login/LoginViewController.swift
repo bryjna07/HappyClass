@@ -71,5 +71,17 @@ final class LoginViewController: BaseViewController {
             }
             .disposed(by: disposeBag)
 
+        loginView.emailFieldView.textField.rx.controlEvent(.editingDidEndOnExit)
+            .bind(with: self) { owner, _ in
+                owner.loginView.passwordFieldView.textField.becomeFirstResponder()
+            }
+            .disposed(by: disposeBag)
+        
+        loginView.passwordFieldView.textField.rx.controlEvent(.editingDidEndOnExit)
+            .bind(with: self) { owner, _ in
+                owner.view.endEditing(true)
+            }
+            .disposed(by: disposeBag)
+        
     }
 }
