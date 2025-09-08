@@ -11,7 +11,7 @@ import SnapKit
 
 final class CommentEditView: BaseView {
     
-    private let categoryLabel = CategoryLabel()
+    private let categoryView = CategoryLabelView()
     
     private let nameLabel = UILabel().then {
         $0.font = .boldSystemFont(ofSize: 16)
@@ -45,7 +45,7 @@ extension CommentEditView {
     
     override func configureHierarchy() {
         [
-            categoryLabel,
+            categoryView,
             nameLabel,
             textView,
             placeholderLabel,
@@ -57,13 +57,13 @@ extension CommentEditView {
     
     override func configureLayout() {
         
-        categoryLabel.snp.makeConstraints {
+        categoryView.snp.makeConstraints {
             $0.top.equalTo(safeAreaLayoutGuide).inset(20)
             $0.leading.equalToSuperview().inset(16)
         }
         
         nameLabel.snp.makeConstraints {
-            $0.top.equalTo(categoryLabel.snp.bottom).offset(8)
+            $0.top.equalTo(categoryView.snp.bottom).offset(8)
             $0.horizontalEdges.equalToSuperview().inset(16)
         }
         
@@ -100,7 +100,7 @@ extension CommentEditView {
     
     func configure(with data: Course) {
         
-        categoryLabel.text = Category(rawValue: data.category)?.name
+        categoryView.label.text = Category(rawValue: data.category)?.name
         nameLabel.text = data.title
     }
     

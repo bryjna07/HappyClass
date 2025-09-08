@@ -30,7 +30,7 @@ final class MainCell: BaseTableViewCell {
         $0.textColor = .black
     }
     
-    private let categoryLabel = CategoryLabel()
+    private let categoryView = CategoryLabelView()
 
     private let descriptionLabel = UILabel().then {
         $0.font = .systemFont(ofSize: 14)
@@ -67,11 +67,12 @@ final class MainCell: BaseTableViewCell {
 
 extension MainCell {
     override func configureHierarchy() {
+        
         [
             mainImageView,
             likeButton,
             nameLabel,
-            categoryLabel,
+            categoryView,
             descriptionLabel,
             priceLabel, salePriceLabel, discountLabel
         ].forEach {
@@ -93,12 +94,13 @@ extension MainCell {
         nameLabel.snp.makeConstraints {
             $0.top.equalTo(mainImageView.snp.bottom).offset(8)
             $0.leading.equalToSuperview().inset(16)
+            $0.trailing.equalTo(categoryView.snp.leading).offset(-4)
         }
         
-        categoryLabel.snp.makeConstraints {
+        categoryView.snp.makeConstraints {
             $0.centerY.equalTo(nameLabel)
-            $0.leading.equalTo(nameLabel.snp.trailing).offset(4)
             $0.trailing.lessThanOrEqualToSuperview().inset(16)
+            $0.width.equalTo(40)
         }
         
         descriptionLabel.snp.makeConstraints {
@@ -144,7 +146,7 @@ extension MainCell {
         
         nameLabel.text = data.title
         
-        categoryLabel.text = Category(rawValue: data.category)?.name
+        categoryView.label.text = Category(rawValue: data.category)?.name
         
         descriptionLabel.text = data.description
         

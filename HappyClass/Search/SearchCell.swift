@@ -21,7 +21,7 @@ final class SearchCell: BaseTableViewCell {
         $0.clipsToBounds = true
     }
     
-    private let categoryLabel = CategoryLabel()
+    private let categoryView = CategoryLabelView()
     
     private let nameLabel = UILabel().then {
         $0.font = .boldSystemFont(ofSize: 16)
@@ -63,7 +63,7 @@ extension SearchCell {
             mainImageView,
             likeButton,
             nameLabel,
-            categoryLabel,
+            categoryView,
             priceLabel, salePriceLabel, discountLabel
         ].forEach {
             contentView.addSubview($0)
@@ -82,13 +82,13 @@ extension SearchCell {
             $0.centerY.equalToSuperview()
         }
         
-        categoryLabel.snp.makeConstraints {
+        categoryView.snp.makeConstraints {
             $0.top.equalToSuperview().inset(8)
             $0.leading.equalTo(mainImageView.snp.trailing).offset(8)
         }
         
         nameLabel.snp.makeConstraints {
-            $0.top.equalTo(categoryLabel.snp.bottom).offset(4)
+            $0.top.equalTo(categoryView.snp.bottom).offset(4)
             $0.leading.equalTo(mainImageView.snp.trailing).offset(8)
             $0.trailing.equalToSuperview().inset(16)
         }
@@ -128,7 +128,7 @@ extension SearchCell {
         
         nameLabel.text = data.title
         
-        categoryLabel.text = Category(rawValue: data.category)?.name
+        categoryView.label.text = Category(rawValue: data.category)?.name
         
         if let price = data.price {
             if let sale = data.salePrice {
