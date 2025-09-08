@@ -26,6 +26,7 @@ final class CommentListViewModel: BaseViewModel {
     struct Output {
         let list: Driver<[Comment]>
         let course: Driver<Course>
+        let errorMessage: Driver<String>
     }
     
     init(service: APIService, data: [Comment], course: Course) {
@@ -38,6 +39,7 @@ final class CommentListViewModel: BaseViewModel {
         
         let comments = BehaviorRelay<[Comment]>(value: [])
         let course = BehaviorRelay<Course>(value: course)
+        let errorText = PublishRelay<String>()
         
         input.viewDidLoad
             .bind(with: self) { owner, _ in
@@ -46,25 +48,24 @@ final class CommentListViewModel: BaseViewModel {
             .disposed(by: disposeBag)
         
         input.viewWillAppear
-            .flatMap { [weak self] data -> Single<Result<CommentInfo, AFError>> in
+            .flatMap { [weak self] data -> Single<Result<CommentInfo, ResponseError>> in
                 guard let self else { return .never() }
-                return self.apiService.fetchData(Router.sesac(.readComments(self.course.classId)))
+                return self.apiService.fetchDataWithResponseError(Router.sesac(.readComments(self.course.classId)))
             }
             .subscribe(with: self) { owner, result in
                 switch result {
                 case .success(let value):
-                    dump(value)
                     comments.accept(value.data)
                 case .failure(let error):
-                    print(error.localizedDescription)
+                    errorText.accept(error.userResponse)
                 }
             }
             .disposed(by: disposeBag)
         
         input.commentDeleteTap
-            .flatMap { [weak self] data -> Single<Result<ResponseMessage, AFError>> in
+            .flatMap { [weak self] data -> Single<Result<ResponseMessage, ResponseError>> in
                 guard let self else { return .never() }
-                return self.apiService.fetchData(Router.sesac(.deleteComments(self.course.classId, data.commentId)))
+                return self.apiService.fetchDataWithResponseError(Router.sesac(.deleteComments(self.course.classId, data.commentId)))
             }
             .subscribe(with: self) { owner, result in
                 switch result {
@@ -72,20 +73,19 @@ final class CommentListViewModel: BaseViewModel {
                     dump(value)
                 case .failure(let error):
                     course.accept(owner.course) // 댓글 삭제 시 새로고침
-                    print(error.localizedDescription)
+                    errorText.accept(error.userResponse)
                 }
             }
             .disposed(by: disposeBag)
         
         course
-            .flatMap { [weak self] data -> Single<Result<CommentInfo, AFError>> in
+            .flatMap { [weak self] data -> Single<Result<CommentInfo, ResponseError>> in
                 guard let self else { return .never() }
-                return self.apiService.fetchData(Router.sesac(.readComments(data.classId)))
+                return self.apiService.fetchDataWithResponseError(Router.sesac(.readComments(data.classId)))
             }
             .subscribe(with: self) { owner, result in
                 switch result {
                 case .success(let value):
-                    dump(value)
                     comments.accept(value.data)
                 case .failure(let error):
                     print(error.localizedDescription)
@@ -93,6 +93,7 @@ final class CommentListViewModel: BaseViewModel {
             }
             .disposed(by: disposeBag)
         
-        return Output(list: comments.asDriver(), course: course.asDriver(onErrorDriveWith: .empty()))
+        return Output(list: comments.asDriver(), course: course.asDriver(onErrorDriveWith: .empty()),
+                      errorMessage: errorText.asDriver(onErrorDriveWith: .empty()))
     }
 }

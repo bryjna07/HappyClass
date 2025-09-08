@@ -101,6 +101,13 @@ final class CommentEditViewController: BaseViewController {
                 owner.commentEditView.placeholderLabel.isHidden = value
             }
             .disposed(by: disposeBag)
+        
+        output.errorMessage
+            .drive(with: self) { owner, text in
+                owner.view.makeToast(text, position: .bottom)
+            }
+            .disposed(by: disposeBag)
+        
 
     }
 

@@ -24,7 +24,7 @@ final class LoginViewModel: BaseViewModel {
         let validText: Driver<String>
         let loginButtonActive: Driver<Bool>
         let loginResult: Driver<Bool>
-        let loginError: Driver<Error>
+        let loginError: Driver<LoginError>
     }
     
     init(service: APIService) {
@@ -34,7 +34,7 @@ final class LoginViewModel: BaseViewModel {
     func transform(input: Input) -> Output {
         
         let validText = PublishRelay<String>()
-        let networkError = PublishRelay<Error>()
+        let networkError = PublishRelay<LoginError>()
         
         let emailAndPassword = Observable
                 .combineLatest(input.emailText, input.passwordText)
@@ -66,8 +66,8 @@ final class LoginViewModel: BaseViewModel {
                     "email": email,
                     "password": password
                 ]
-                return self.apiService.fetchData(Router.sesac(.login(param)))
-                    .map { (response: Result<Profile, AFError>) -> Bool in
+                return self.apiService.fetchDataWithLoginError(Router.sesac(.login(param)))
+                    .map { (response: Result<Profile, LoginError>) -> Bool in
                         switch response {
                         case .success(let login):
                             UserDefaultsManager.shared.token = login.accessToken ?? ""

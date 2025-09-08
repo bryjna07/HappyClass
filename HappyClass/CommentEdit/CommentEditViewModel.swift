@@ -31,6 +31,7 @@ final class CommentEditViewModel: BaseViewModel {
         let validText: Driver<(String, Bool)>
         let createButtonActive: Driver<Bool>
         let result: Driver<Bool>
+        let errorMessage: Driver<String>
     }
     
     init(service: APIService, data: Course, comment: Comment? = nil, type: EditType) {
@@ -47,6 +48,7 @@ final class CommentEditViewModel: BaseViewModel {
         let reponseResult = PublishRelay<Bool>()
         let buttonActive = BehaviorRelay<Bool>(value: false)
         let commentText = BehaviorRelay<String>(value: "")
+        let errorText = PublishRelay<String>()
         
         input.viewDidLoad
             .bind(with: self) { owner, _ in
@@ -84,18 +86,17 @@ final class CommentEditViewModel: BaseViewModel {
             input.rightButtonTap
                 .withLatestFrom(input.commentText)
                 .distinctUntilChanged()
-                .flatMap { [weak self] text -> Single<Result<Comment, AFError>> in
+                .flatMap { [weak self] text -> Single<Result<Comment, ResponseError>> in
                     guard let self else { return .never() }
-                    return self.apiService.fetchData(Router.sesac(.createComments(self.data.classId, text)))
+                    return self.apiService.fetchDataWithResponseError(Router.sesac(.createComments(self.data.classId, text)))
                 }
                 .subscribe(with: self) { owner, result in
                     switch result {
                     case .success(let comment):
-                        dump(comment)
                         reponseResult.accept(true)
                     case .failure(let error):
                         reponseResult.accept(false)
-                        print(error.localizedDescription)
+                        errorText.accept(error.userResponse)
                     }
                 }
                 .disposed(by: disposeBag)
@@ -103,18 +104,17 @@ final class CommentEditViewModel: BaseViewModel {
             input.rightButtonTap
                 .withLatestFrom(input.commentText)
                 .distinctUntilChanged()
-                .flatMap { [weak self] text -> Single<Result<Comment, AFError>> in
+                .flatMap { [weak self] text -> Single<Result<Comment, ResponseError>> in
                     guard let self, let comment else { return .never() }
-                    return self.apiService.fetchData(Router.sesac(.updateComments(self.data.classId, comment.commentId, text)))
+                    return self.apiService.fetchDataWithResponseError(Router.sesac(.updateComments(self.data.classId, comment.commentId, text)))
                 }
                 .subscribe(with: self) { owner, result in
                     switch result {
                     case .success(let comment):
-                        dump(comment)
                         reponseResult.accept(true)
                     case .failure(let error):
                         reponseResult.accept(false)
-                        print(error.localizedDescription)
+                        errorText.accept(error.userResponse)
                     }
                 }
                 .disposed(by: disposeBag)
@@ -124,7 +124,8 @@ final class CommentEditViewModel: BaseViewModel {
                       commentText: commentText.asDriver(onErrorJustReturn: ""),
                       validText: validText.asDriver(),
                       createButtonActive: buttonActive.asDriver(onErrorDriveWith: .empty()),
-                      result: reponseResult.asDriver(onErrorJustReturn: false)
+                      result: reponseResult.asDriver(onErrorJustReturn: false),
+                      errorMessage: errorText.asDriver(onErrorDriveWith: .empty())
         )
     }
 }

@@ -35,6 +35,7 @@ enum ResponseError: Int, Error {
     case notFind = 410 // 클래스 or 댓글 없음
     case notAuthority = 445
     case unknwon = 503
+    case blank
     
     var userResponse: String {
         switch self {
@@ -50,6 +51,8 @@ enum ResponseError: Int, Error {
             return "작성자만 가능합니다"
         case .unknwon:
             return "알 수 없는 에러입니다"
+        case .blank:
+            return "댓글 삭제 완료"
         }
     }
 }

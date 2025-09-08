@@ -26,6 +26,7 @@ final class DetailViewModel: BaseViewModel {
         let imageList: Driver<[String]>
         let commentCount: Driver<Int>
         let commentList: Driver<[Comment]>
+        let errorMessage: Driver<String>
     }
     
     init(service: APIService, classId: String) {
@@ -39,12 +40,13 @@ final class DetailViewModel: BaseViewModel {
         let imageList = BehaviorRelay<[String]>(value: [])
         let commentCount = BehaviorRelay<Int>(value: 0)
         let commentList = BehaviorRelay<[Comment]>(value: [])
+        let errorText = PublishRelay<String>()
         
         input.viewDidLoad
-            .flatMap { [weak self] _ -> Single<Result<Course, AFError>> in
+            .flatMap { [weak self] _ -> Single<Result<Course, ResponseError>> in
                 guard let self else { return .never() }
                     return self.apiService
-                    .fetchData(Router.sesac(.courseDetail(self.classId)))
+                    .fetchDataWithResponseError(Router.sesac(.courseDetail(self.classId)))
                 }
             .subscribe(with: self) { owner, result in
                 switch result {
@@ -54,15 +56,15 @@ final class DetailViewModel: BaseViewModel {
                         imageList.accept(images)
                     }
                 case .failure(let error):
-                    print(error.localizedDescription)
+                    errorText.accept(error.userResponse)
                 }
             }
             .disposed(by: disposeBag)
         
         input.viewWillAppear
-            .flatMap { [weak self] _ -> Single<Result<CommentInfo, AFError>> in
+            .flatMap { [weak self] _ -> Single<Result<CommentInfo, ResponseError>> in
                 guard let self else { return .never() }
-                return self.apiService.fetchData(Router.sesac(.readComments(self.classId)))
+                return self.apiService.fetchDataWithResponseError(Router.sesac(.readComments(self.classId)))
             }
             .subscribe(with: self) { owner, result in
                 switch result {
@@ -70,7 +72,7 @@ final class DetailViewModel: BaseViewModel {
                     commentCount.accept(data.data.count)
                     commentList.accept(data.data)
                 case .failure(let error):
-                    print(error.localizedDescription)
+                    errorText.accept(error.userResponse)
                 }
             }
             .disposed(by: disposeBag)
@@ -78,7 +80,8 @@ final class DetailViewModel: BaseViewModel {
         return Output(data: data.asDriver(onErrorDriveWith: .empty()),
                       imageList: imageList.asDriver(),
                       commentCount: commentCount.asDriver(),
-                      commentList: commentList.asDriver()
+                      commentList: commentList.asDriver(),
+                      errorMessage: errorText.asDriver(onErrorDriveWith: .empty())
         )
     }
 }

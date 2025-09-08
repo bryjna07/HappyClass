@@ -8,6 +8,7 @@
 import UIKit
 import RxSwift
 import RxCocoa
+import Toast
 
 final class LoginViewController: BaseViewController {
     
@@ -63,5 +64,12 @@ final class LoginViewController: BaseViewController {
                 }
             }
             .disposed(by: disposeBag)
+        
+        output.loginError
+            .drive(with: self) { owner, error in
+                owner.view.makeToast(error.userResponse, position: .bottom)
+            }
+            .disposed(by: disposeBag)
+
     }
 }

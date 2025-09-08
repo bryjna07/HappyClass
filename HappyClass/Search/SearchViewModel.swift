@@ -42,9 +42,9 @@ final class SearchViewModel: BaseViewModel {
             }
             .filter { !$0.isEmpty }
             .distinctUntilChanged()
-            .flatMap { [weak self] text -> Single<Result<CoursesInfo, AFError>> in
+            .flatMap { [weak self] text -> Single<Result<CoursesInfo, ResponseError>> in
                 guard let self else { return .never() }
-                return self.apiService.fetchData(Router.sesac(.search(text)))
+                return self.apiService.fetchDataWithResponseError(Router.sesac(.search(text)))
             }
             .subscribe(with: self) { owner, response in
                 switch response {
@@ -56,27 +56,27 @@ final class SearchViewModel: BaseViewModel {
                         showEmptyView.accept((false, nil))
                     }
                 case .failure(let error):
-                    errorText.accept(error.localizedDescription)
+                    errorText.accept(error.userResponse)
                 }
             }
             .disposed(by: disposeBag)
         
         input.likeTap
-            .flatMapLatest { [weak self] (id, bool) -> Single<(String, Result<ResponseMessage, AFError>)> in
+            .flatMapLatest { [weak self] (id, bool) -> Single<(String, Result<ResponseMessage, ResponseError>)> in
                 guard let self else { return .never() }
                 return self.apiService
-                    .fetchData(Router.sesac(.like(id, bool)))
+                    .fetchDataWithResponseError(Router.sesac(.like(id, bool)))
                     .map { (id, $0) }
             }
-            .flatMapLatest { [weak self] (id, likeResult) -> Single<(String, Result<Course, AFError>)> in
+            .flatMapLatest { [weak self] (id, likeResult) -> Single<(String, Result<Course, ResponseError>)> in
                 guard let self else { return .never() }
                 switch likeResult {
                 case .success:
                     return self.apiService
-                        .fetchData(Router.sesac(.courseDetail(id)))
+                        .fetchDataWithResponseError(Router.sesac(.courseDetail(id)))
                         .map { (id, $0) }
-                case .failure(let err):
-                    errorText.accept(err.localizedDescription)
+                case .failure(let error):
+                    errorText.accept(error.userResponse)
                     return .never()
                 }
             }
@@ -89,7 +89,7 @@ final class SearchViewModel: BaseViewModel {
                             list.accept(coursesList)
                         }
                 case .failure(let error):
-                    errorText.accept(error.localizedDescription)
+                    errorText.accept(error.userResponse)
                 }
             })
             .disposed(by: disposeBag)

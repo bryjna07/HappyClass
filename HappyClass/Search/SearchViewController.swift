@@ -88,6 +88,12 @@ final class SearchViewController: BaseViewController {
             }
             .disposed(by: disposeBag)
         
+        output.errorMessage
+            .drive(with: self) { owner, text in
+                owner.view.makeToast(text, position: .bottom)
+            }
+            .disposed(by: disposeBag)
+        
     }
     
 }

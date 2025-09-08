@@ -8,6 +8,7 @@
 import UIKit
 import RxSwift
 import RxCocoa
+import Toast
 
 final class CommentListViewController: BaseViewController {
     
@@ -79,6 +80,12 @@ final class CommentListViewController: BaseViewController {
                 let vm = CommentEditViewModel(service: owner.viewModel.apiService, data: value, type: .create)
                 let vc = CommentEditViewController(viewModel: vm, type: .create)
                 owner.navigationController?.pushViewController(vc, animated: true)
+            }
+            .disposed(by: disposeBag)
+        
+        output.errorMessage
+            .drive(with: self) { owner, text in
+                owner.view.makeToast(text, position: .bottom)
             }
             .disposed(by: disposeBag)
         

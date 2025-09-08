@@ -8,6 +8,7 @@
 import UIKit
 import RxSwift
 import RxCocoa
+import Toast
 
 final class MainViewController: BaseViewController {
     
@@ -134,6 +135,13 @@ final class MainViewController: BaseViewController {
                 owner.navigationController?.pushViewController(vc, animated: true)
             }
             .disposed(by: disposeBag)
+        
+        output.errorMessage
+            .drive(with: self) { owner, text in
+                owner.view.makeToast(text, position: .bottom)
+            }
+            .disposed(by: disposeBag)
+
 
     }
 }
