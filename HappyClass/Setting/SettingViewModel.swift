@@ -12,7 +12,7 @@ import Alamofire
 
 final class SettingViewModel: BaseViewModel {
     
-    private let apiService: APIService
+    let apiService: APIService
     
     struct Input {
         

@@ -11,19 +11,22 @@ import SnapKit
 
 final class SettingView: BaseView {
     
+    let logoutButton = PointButton(title: "로그아웃").then {
+        $0.backgroundColor = .mainOrange
+    }
+    
 }
 
 extension SettingView {
     
     override func configureHierarchy() {
-//        [
-//
-//        ].forEach {
-//            addSubview($0)
-//        }
+        addSubview(logoutButton)
     }
     
     override func configureLayout() {
-     
+        logoutButton.snp.makeConstraints {
+            $0.top.horizontalEdges.equalTo(safeAreaLayoutGuide).inset(16)
+            $0.height.equalTo(44)
+        }
     }
 }
