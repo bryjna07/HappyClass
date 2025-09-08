@@ -57,9 +57,10 @@ final class DetailViewController: BaseViewController {
             .disposed(by: disposeBag)
         
         detailView.commentButton.rx.tap
-            .withLatestFrom(output.commentList)
-            .bind(with: self) { owner, comments in
-                let vm = CommentListViewModel(service: owner.viewModel.apiService, data: comments, title: owner.navigationItem.title)
+            .asDriver()
+            .withLatestFrom(Driver.combineLatest(output.commentList, output.data))
+            .drive(with: self) { owner, tuple in
+                let vm = CommentListViewModel(service: owner.viewModel.apiService, data: tuple.0, course: tuple.1)
                 let vc = CommentListViewController(viewModel: vm)
                 owner.navigationController?.pushViewController(vc, animated: true)
             }

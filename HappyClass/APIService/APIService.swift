@@ -17,7 +17,7 @@ final class APIService {
         return Single.create { observer in
             
             AF.request(router)
-                .validate(statusCode: 200..<500)
+                .validate(statusCode: 200..<300)
                 .responseDecodable(of: T.self) { response in
                     switch response.result {
                     case .success(let value):
@@ -31,5 +31,5 @@ final class APIService {
             return Disposables.create()
         }
     }
-}
 
+}

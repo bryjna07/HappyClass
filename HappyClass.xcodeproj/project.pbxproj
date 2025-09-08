@@ -14,7 +14,6 @@
 		17B87EC82E694808001CB8DC /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 17B87EC72E694808001CB8DC /* Alamofire */; };
 		17B87ECB2E694824001CB8DC /* RxCocoa in Frameworks */ = {isa = PBXBuildFile; productRef = 17B87ECA2E694824001CB8DC /* RxCocoa */; };
 		17B87ECD2E694824001CB8DC /* RxSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 17B87ECC2E694824001CB8DC /* RxSwift */; };
-		17B87ED02E69499A001CB8DC /* RxDataSources in Frameworks */ = {isa = PBXBuildFile; productRef = 17B87ECF2E69499A001CB8DC /* RxDataSources */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -52,7 +51,6 @@
 				17B87EC52E6947F0001CB8DC /* Toast in Frameworks */,
 				17B87EC22E6947DE001CB8DC /* Kingfisher in Frameworks */,
 				17B87EBC2E6947BD001CB8DC /* SnapKit in Frameworks */,
-				17B87ED02E69499A001CB8DC /* RxDataSources in Frameworks */,
 				17B87EBF2E6947C9001CB8DC /* Then in Frameworks */,
 				17B87ECD2E694824001CB8DC /* RxSwift in Frameworks */,
 			);
@@ -104,7 +102,6 @@
 				17B87EC72E694808001CB8DC /* Alamofire */,
 				17B87ECA2E694824001CB8DC /* RxCocoa */,
 				17B87ECC2E694824001CB8DC /* RxSwift */,
-				17B87ECF2E69499A001CB8DC /* RxDataSources */,
 			);
 			productName = HappyClass;
 			productReference = 17B87E7C2E69168E001CB8DC /* HappyClass.app */;
@@ -141,7 +138,6 @@
 				17B87EC32E6947F0001CB8DC /* XCRemoteSwiftPackageReference "Toast-Swift" */,
 				17B87EC62E694808001CB8DC /* XCRemoteSwiftPackageReference "Alamofire" */,
 				17B87EC92E694824001CB8DC /* XCRemoteSwiftPackageReference "RxSwift" */,
-				17B87ECE2E69499A001CB8DC /* XCRemoteSwiftPackageReference "RxDataSources" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 17B87E7D2E69168E001CB8DC /* Products */;
@@ -183,11 +179,12 @@
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = HappyClass/Application/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "나영진";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = UIInterfaceOrientationPortrait;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -214,11 +211,12 @@
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = HappyClass/Application/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "나영진";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = UIInterfaceOrientationPortrait;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -429,14 +427,6 @@
 				minimumVersion = 6.9.0;
 			};
 		};
-		17B87ECE2E69499A001CB8DC /* XCRemoteSwiftPackageReference "RxDataSources" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/RxSwiftCommunity/RxDataSources.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 5.0.2;
-			};
-		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -474,11 +464,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 17B87EC92E694824001CB8DC /* XCRemoteSwiftPackageReference "RxSwift" */;
 			productName = RxSwift;
-		};
-		17B87ECF2E69499A001CB8DC /* RxDataSources */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 17B87ECE2E69499A001CB8DC /* XCRemoteSwiftPackageReference "RxDataSources" */;
-			productName = RxDataSources;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

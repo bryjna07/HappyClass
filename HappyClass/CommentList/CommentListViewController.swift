@@ -26,23 +26,22 @@ final class CommentListViewController: BaseViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "pencil.and.scribble"), style: .plain, target: nil, action: nil)
         bind()
     }
-    
-    override func setupNaviBar() {
-        super.setupNaviBar()
-    }
-    
+     
     private func bind() {
+        let deleteTap = PublishRelay<Comment>()
         
-        let input = CommentListViewModel.Input(viewDidLoad: .just(())
+        let input = CommentListViewModel.Input(viewDidLoad: .just(()),
+                                               commentDeleteTap: deleteTap.asObservable(),
         )
         
         let output = viewModel.transform(input: input)
         
-        output.navTitle
+        output.course
             .drive(with: self) { owner, value in
-                owner.navigationItem.title = value
+                owner.navigationItem.title = value.title
             }
             .disposed(by: disposeBag)
 
@@ -53,21 +52,39 @@ final class CommentListViewController: BaseViewController {
                     cell.configure(with: element)
                     
                     cell.editButton.rx.tap
-                        .subscribe(with: self) { owner, _ in
-                            owner.sheet()
+                        .withLatestFrom(output.course)
+                        .bind(with: self) { owner, value in
+                            owner.actionSheet {
+                                let vm = CommentEditViewModel(service: owner.viewModel.apiService, data: value, comment: element, type: .edit)
+                                let vc = CommentEditViewController(viewModel: vm, type: .edit)
+                                owner.navigationController?.pushViewController(vc, animated: true)
+                            } onDelete: {
+                                deleteTap.accept(element)
+                            }
                         }
                         .disposed(by: cell.disposeBag)
+                }
+                .disposed(by: disposeBag)
+        
+        navigationItem.rightBarButtonItem?.rx.tap
+            .withLatestFrom(output.course)
+            .bind(with: self) { owner, value in
+                let vm = CommentEditViewModel(service: owner.viewModel.apiService, data: value, type: .create)
+                let vc = CommentEditViewController(viewModel: vm, type: .create)
+                owner.navigationController?.pushViewController(vc, animated: true)
             }
             .disposed(by: disposeBag)
         
     }
     
-    private func sheet() {
+    private func actionSheet(onEdit: @escaping () -> Void, onDelete: @escaping () -> Void) {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
-        let edit = UIAlertAction(title: "댓글 수정", style: .default) { [weak self] _ in
+        let edit = UIAlertAction(title: "댓글 수정", style: .default) { _ in
+            onEdit()
         }
-        let delete = UIAlertAction(title: "댓글 삭제", style: .destructive) { [weak self] _ in
+        let delete = UIAlertAction(title: "댓글 삭제", style: .destructive) { _ in
+            onDelete()
         }
         
         let cancel = UIAlertAction(title: "취소", style: .cancel)

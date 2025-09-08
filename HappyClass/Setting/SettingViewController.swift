@@ -28,4 +28,13 @@ final class SettingViewController: BaseViewController {
         super.viewDidLoad()
         
     }
+    
+    override func setupNaviBar() {
+        super.setupNaviBar()
+        let titleLabel = UILabel()
+        titleLabel.text = "프로필"
+        titleLabel.font = .boldSystemFont(ofSize: 20)
+        titleLabel.textColor = .navy
+        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: titleLabel)
+    }
 }

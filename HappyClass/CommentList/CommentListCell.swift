@@ -79,6 +79,11 @@ extension CommentListCell {
             $0.leading.equalTo(profileImageView.snp.trailing).offset(8)
         }
         
+        editButton.snp.makeConstraints {
+            $0.centerY.equalTo(profileImageView)
+            $0.trailing.equalToSuperview().inset(16)
+        }
+        
         descriptionLabel.snp.makeConstraints {
             $0.top.equalTo(dateLabel.snp.bottom).offset(16)
             $0.leading.equalTo(profileImageView.snp.trailing).offset(8)

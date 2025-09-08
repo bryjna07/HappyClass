@@ -15,35 +15,67 @@ final class CommentListViewModel: BaseViewModel {
     let apiService: APIService
     private let disposeBag = DisposeBag()
     private let data: [Comment]
-    private let title: String?
+    private let course: Course
     
     struct Input {
         let viewDidLoad: Observable<Void>
+        let commentDeleteTap: Observable<Comment>
     }
     
     struct Output {
         let list: Driver<[Comment]>
-        let navTitle: Driver<String?>
+        let course: Driver<Course>
     }
     
-    init(service: APIService, data: [Comment], title: String?) {
+    init(service: APIService, data: [Comment], course: Course) {
         self.apiService = service
         self.data = data
-        self.title = title
+        self.course = course
     }
     
     func transform(input: Input) -> Output {
         
         let comments = BehaviorRelay<[Comment]>(value: [])
-        let title = BehaviorRelay<String?>(value: nil)
+        let course = BehaviorRelay<Course>(value: course)
         
         input.viewDidLoad
             .bind(with: self) { owner, _ in
                 comments.accept(owner.data)
-                title.accept(owner.title)
             }
             .disposed(by: disposeBag)
         
-        return Output(list: comments.asDriver(), navTitle: title.asDriver())
+        input.commentDeleteTap
+            .flatMap { [weak self] data -> Single<Result<ResponseMessage, AFError>> in
+                guard let self else { return .never() }
+                return self.apiService.fetchData(Router.sesac(.deleteComments(self.course.classId, data.commentId)))
+            }
+            .subscribe(with: self) { owner, result in
+                switch result {
+                case .success(let value):
+                    dump(value)
+                case .failure(let error):
+                    course.accept(owner.course) // 댓글 삭제 시 새로고침
+                    print(error.localizedDescription)
+                }
+            }
+            .disposed(by: disposeBag)
+        
+        course
+            .flatMap { [weak self] data -> Single<Result<CommentInfo, AFError>> in
+                guard let self else { return .never() }
+                return self.apiService.fetchData(Router.sesac(.readComments(data.classId)))
+            }
+            .subscribe(with: self) { owner, result in
+                switch result {
+                case .success(let value):
+                    dump(value)
+                    comments.accept(value.data)
+                case .failure(let error):
+                    print(error.localizedDescription)
+                }
+            }
+            .disposed(by: disposeBag)
+        
+        return Output(list: comments.asDriver(), course: course.asDriver(onErrorDriveWith: .empty()))
     }
 }
