@@ -50,16 +50,31 @@ final class CommentEditViewController: BaseViewController {
     
     private func bind() {
         
-        let textInput = createButton.rx.tap
-            .withLatestFrom(commentEditView.textView.rx.text.orEmpty.asObservable())
         
-        let input = CommentEditViewModel.Input(rightButtonTap: textInput)
+        let input = CommentEditViewModel.Input(
+            commentText: commentEditView.textView.rx.text.orEmpty.asObservable(),
+            rightButtonTap: createButton.rx.tap.asObservable()
+        )
         
         let output = viewModel.transform(input: input)
         
         output.course
             .drive(with: self) { owner, data in
                 owner.commentEditView.configure(with: data)
+            }
+            .disposed(by: disposeBag)
+        
+        output.createButtonActive
+            .drive(with: self) { owner, value in
+                owner.createButton.isEnabled = value ? true : false
+                owner.createButton.tintColor = value ? .navy : .mainGray
+            }
+            .disposed(by: disposeBag)
+        
+        output.validText
+            .drive(with: self) { owner, value in
+                owner.commentEditView.validLabel.text = value.0
+                owner.commentEditView.validLabel.textColor = value.1 ? .black : .mainOrange
             }
             .disposed(by: disposeBag)
         

@@ -19,6 +19,7 @@ final class CommentListViewModel: BaseViewModel {
     
     struct Input {
         let viewDidLoad: Observable<Void>
+        let viewWillAppear: Observable<Void>
         let commentDeleteTap: Observable<Comment>
     }
     
@@ -41,6 +42,22 @@ final class CommentListViewModel: BaseViewModel {
         input.viewDidLoad
             .bind(with: self) { owner, _ in
                 comments.accept(owner.data)
+            }
+            .disposed(by: disposeBag)
+        
+        input.viewWillAppear
+            .flatMap { [weak self] data -> Single<Result<CommentInfo, AFError>> in
+                guard let self else { return .never() }
+                return self.apiService.fetchData(Router.sesac(.readComments(self.course.classId)))
+            }
+            .subscribe(with: self) { owner, result in
+                switch result {
+                case .success(let value):
+                    dump(value)
+                    comments.accept(value.data)
+                case .failure(let error):
+                    print(error.localizedDescription)
+                }
             }
             .disposed(by: disposeBag)
         

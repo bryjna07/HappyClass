@@ -20,12 +20,14 @@ final class CommentEditViewModel: BaseViewModel {
     
     
     struct Input {
-        let rightButtonTap: Observable<String>
+        let commentText: Observable<String>
+        let rightButtonTap: Observable<Void>
     }
     
     struct Output {
         let course: Driver<Course>
-        let validText: Driver<String>
+        let validText: Driver<(String, Bool)>
+        let createButtonActive: Driver<Bool>
         let result: Driver<Bool>
     }
     
@@ -39,12 +41,38 @@ final class CommentEditViewModel: BaseViewModel {
     func transform(input: Input) -> Output {
         
         let course = BehaviorRelay<Course>(value: data)
-        let validText = BehaviorRelay(value: "0 / 300")
+        let validText = BehaviorRelay(value: ("0 / 300", false))
         let reponseResult = PublishRelay<Bool>()
+        let buttonActive = BehaviorRelay<Bool>(value: false)
+        
+        input.commentText
+            .bind(with: self) { owner, text in
+                if text.count >= 2, text.count <= 200 {
+                    buttonActive.accept(true)
+                } else {
+                    buttonActive.accept(false)
+                }
+            }
+            .disposed(by: disposeBag)
+        
+        input.commentText
+            .map {
+                if $0.count > 200 {
+                    return ("200자 초과", false)
+                } else if $0.count >= 150 {
+                    return ("\($0.count) / 200", false)
+                } else {
+                    return ("\($0.count) / 200", true)
+                }
+            }
+            .bind(to: validText)
+            .disposed(by: disposeBag)
         
         switch type {
         case .create:
             input.rightButtonTap
+                .withLatestFrom(input.commentText)
+                .distinctUntilChanged()
                 .flatMap { [weak self] text -> Single<Result<Comment, AFError>> in
                     guard let self else { return .never() }
                     return self.apiService.fetchData(Router.sesac(.createComments(self.data.classId, text)))
@@ -62,6 +90,8 @@ final class CommentEditViewModel: BaseViewModel {
                 .disposed(by: disposeBag)
         case .edit:
             input.rightButtonTap
+                .withLatestFrom(input.commentText)
+                .distinctUntilChanged()
                 .flatMap { [weak self] text -> Single<Result<Comment, AFError>> in
                     guard let self, let comment else { return .never() }
                     return self.apiService.fetchData(Router.sesac(.updateComments(self.data.classId, comment.commentId, text)))
@@ -81,6 +111,7 @@ final class CommentEditViewModel: BaseViewModel {
         
         return Output(course: course.asDriver(onErrorDriveWith: .empty()),
                       validText: validText.asDriver(),
+                      createButtonActive: buttonActive.asDriver(onErrorDriveWith: .empty()),
                       result: reponseResult.asDriver(onErrorJustReturn: false)
         )
     }

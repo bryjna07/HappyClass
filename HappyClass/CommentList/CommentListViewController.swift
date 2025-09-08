@@ -14,6 +14,7 @@ final class CommentListViewController: BaseViewController {
     private let commentListView = CommentListView()
     private let viewModel : CommentListViewModel
     private let disposeBag = DisposeBag()
+    private let viewWillAppearRelay = PublishRelay<Void>()
     
     init(viewModel: CommentListViewModel) {
         self.viewModel = viewModel
@@ -29,11 +30,17 @@ final class CommentListViewController: BaseViewController {
         navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "pencil.and.scribble"), style: .plain, target: nil, action: nil)
         bind()
     }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        viewWillAppearRelay.accept(())
+    }
      
     private func bind() {
         let deleteTap = PublishRelay<Comment>()
         
         let input = CommentListViewModel.Input(viewDidLoad: .just(()),
+                                               viewWillAppear: viewWillAppearRelay.asObservable(),
                                                commentDeleteTap: deleteTap.asObservable(),
         )
         

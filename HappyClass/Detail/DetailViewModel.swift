@@ -18,6 +18,7 @@ final class DetailViewModel: BaseViewModel {
     
     struct Input {
         let viewDidLoad: Observable<Void>
+        let viewWillAppear: Observable<Void>
     }
     
     struct Output {
@@ -58,7 +59,7 @@ final class DetailViewModel: BaseViewModel {
             }
             .disposed(by: disposeBag)
         
-        input.viewDidLoad
+        input.viewWillAppear
             .flatMap { [weak self] _ -> Single<Result<CommentInfo, AFError>> in
                 guard let self else { return .never() }
                 return self.apiService.fetchData(Router.sesac(.readComments(self.classId)))

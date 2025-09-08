@@ -15,6 +15,7 @@ final class DetailViewController: BaseViewController {
     private let detailView = DetailView()
     private let viewModel : DetailViewModel
     private let disposeBag = DisposeBag()
+    private let viewWillAppearRelay = PublishRelay<Void>()
     
     init(viewModel: DetailViewModel) {
         self.viewModel = viewModel
@@ -27,13 +28,18 @@ final class DetailViewController: BaseViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         bind()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        viewWillAppearRelay.accept(())
     }
     
     private func bind() {
         
-        let input = DetailViewModel.Input(viewDidLoad: .just(()))
+        let input = DetailViewModel.Input(viewDidLoad: .just(()),
+                                          viewWillAppear: viewWillAppearRelay.asObservable())
         
         let output = viewModel.transform(input: input)
         
