@@ -42,7 +42,7 @@ final class DetailView: BaseView {
     }
     
     private let placeImageView = UIImageView().then {
-        $0.image = UIImage(systemName: "location.fill")
+        $0.image = .location
         $0.tintColor = .mainOrange
         $0.contentMode = .scaleAspectFit
     }
@@ -59,7 +59,7 @@ final class DetailView: BaseView {
     }
 
     private let timeImageView = UIImageView().then {
-        $0.image = UIImage(systemName: "clock.fill")
+        $0.image = .time
         $0.tintColor = .mainOrange
         $0.contentMode = .scaleAspectFit
     }
@@ -81,7 +81,7 @@ final class DetailView: BaseView {
     }
 
     private let peopleImageView = UIImageView().then {
-        $0.image = UIImage(systemName: "person.fill")
+        $0.image = .people
         $0.tintColor = .mainOrange
         $0.contentMode = .scaleAspectFit
     }

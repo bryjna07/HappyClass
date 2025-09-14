@@ -28,7 +28,7 @@ final class CommentListViewController: BaseViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "pencil.and.scribble"), style: .plain, target: nil, action: nil)
+        navigationItem.rightBarButtonItem = UIBarButtonItem(image: .comment, style: .plain, target: nil, action: nil)
         bind()
     }
     

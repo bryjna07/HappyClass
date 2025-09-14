@@ -36,7 +36,7 @@ final class MainView: BaseView {
     
     let sortButton = UIButton().then {
         var config = UIButton.Configuration.plain()
-        config.image = UIImage(systemName: "line.3.horizontal")
+        config.image = .sort
         config.imagePlacement = .trailing
         config.baseForegroundColor = .mainOrange
         config.contentInsets = .init(top: 0, leading: 0, bottom: 0, trailing: 0)

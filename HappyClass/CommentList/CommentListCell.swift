@@ -103,7 +103,7 @@ extension CommentListCell {
         if let path = data.creator.profileImage {
             profileImageView.setKFImage(path: path)
         } else {
-            profileImageView.image = UIImage(systemName: "person.fill")
+            profileImageView.image = .noProfile
         }
         
         nicknameLabel.text = data.creator.nick
