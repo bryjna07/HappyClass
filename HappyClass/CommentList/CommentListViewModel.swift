@@ -50,7 +50,7 @@ final class CommentListViewModel: BaseViewModel {
         input.viewWillAppear
             .flatMap { [weak self] data -> Single<Result<CommentInfo, ResponseError>> in
                 guard let self else { return .never() }
-                return self.apiService.fetchDataWithResponseError(Router.sesac(.readComments(self.course.classId)))
+                return self.apiService.fetchDataWithResponseError(Router.comment(.readComments(self.course.classId)))
             }
             .subscribe(with: self) { owner, result in
                 switch result {
@@ -65,7 +65,7 @@ final class CommentListViewModel: BaseViewModel {
         input.commentDeleteTap
             .flatMap { [weak self] data -> Single<Result<ResponseMessage, ResponseError>> in
                 guard let self else { return .never() }
-                return self.apiService.fetchDataWithResponseError(Router.sesac(.deleteComments(self.course.classId, data.commentId)))
+                return self.apiService.fetchDataWithResponseError(Router.comment(.deleteComments(self.course.classId, data.commentId)))
             }
             .subscribe(with: self) { owner, result in
                 switch result {
@@ -81,7 +81,7 @@ final class CommentListViewModel: BaseViewModel {
         course
             .flatMap { [weak self] data -> Single<Result<CommentInfo, ResponseError>> in
                 guard let self else { return .never() }
-                return self.apiService.fetchDataWithResponseError(Router.sesac(.readComments(data.classId)))
+                return self.apiService.fetchDataWithResponseError(Router.comment(.readComments(data.classId)))
             }
             .subscribe(with: self) { owner, result in
                 switch result {

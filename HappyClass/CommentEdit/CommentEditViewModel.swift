@@ -88,7 +88,7 @@ final class CommentEditViewModel: BaseViewModel {
                 .distinctUntilChanged()
                 .flatMap { [weak self] text -> Single<Result<Comment, ResponseError>> in
                     guard let self else { return .never() }
-                    return self.apiService.fetchDataWithResponseError(Router.sesac(.createComments(self.data.classId, text)))
+                    return self.apiService.fetchDataWithResponseError(Router.comment(.createComments(self.data.classId, text)))
                 }
                 .subscribe(with: self) { owner, result in
                     switch result {
@@ -106,7 +106,7 @@ final class CommentEditViewModel: BaseViewModel {
                 .distinctUntilChanged()
                 .flatMap { [weak self] text -> Single<Result<Comment, ResponseError>> in
                     guard let self, let comment else { return .never() }
-                    return self.apiService.fetchDataWithResponseError(Router.sesac(.updateComments(self.data.classId, comment.commentId, text)))
+                    return self.apiService.fetchDataWithResponseError(Router.comment(.updateComments(self.data.classId, comment.commentId, text)))
                 }
                 .subscribe(with: self) { owner, result in
                     switch result {

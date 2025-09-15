@@ -64,7 +64,7 @@ final class DetailViewModel: BaseViewModel {
         input.viewWillAppear
             .flatMap { [weak self] _ -> Single<Result<CommentInfo, ResponseError>> in
                 guard let self else { return .never() }
-                return self.apiService.fetchDataWithResponseError(Router.sesac(.readComments(self.classId)))
+                return self.apiService.fetchDataWithResponseError(Router.comment(.readComments(self.classId)))
             }
             .subscribe(with: self) { owner, result in
                 switch result {
