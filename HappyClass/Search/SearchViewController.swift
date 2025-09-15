@@ -73,7 +73,7 @@ final class SearchViewController: BaseViewController {
                     
                     cell.likeButton.rx.tap
                         .map {
-                            (element.classId, !element.isLiked)
+                            (element.id, !element.isLiked)
                         }
                         .bind(to: likeTap)
                         .disposed(by: cell.disposeBag)
@@ -81,8 +81,8 @@ final class SearchViewController: BaseViewController {
             .disposed(by: disposeBag)
         
         searchView.tableView.rx.modelSelected(Course.self)
-            .bind(with: self) { owner, data in
-                let vm = DetailViewModel(service: owner.viewModel.apiService, classId: data.classId)
+            .bind(with: self) { owner, course in
+                let vm = DetailViewModel(service: owner.viewModel.apiService, classId: course.id)
                 let vc = DetailViewController(viewModel: vm)
                 owner.navigationController?.pushViewController(vc, animated: true)
             }

@@ -67,11 +67,12 @@ final class LoginViewModel: BaseViewModel {
                     "password": password
                 ]
                 return self.apiService.fetchDataWithLoginError(Router.sesac(.login(param)))
-                    .map { (response: Result<Profile, LoginError>) -> Bool in
+                    .map { (response: Result<ProfileDTO, LoginError>) -> Bool in
                         switch response {
-                        case .success(let login):
-                            UserDefaultsManager.shared.token = login.accessToken ?? ""
-                            UserDefaultsManager.shared.id = login.userId
+                        case .success(let dto):
+                            let user = dto.toDomain()
+                            UserDefaultsManager.shared.token = dto.accessToken ?? ""
+                            UserDefaultsManager.shared.id = user.userId
                             return true
                         case .failure(let error):
                             networkError.accept(error)

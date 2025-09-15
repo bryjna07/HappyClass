@@ -150,7 +150,7 @@ extension MainCell {
         
         descriptionLabel.text = data.description
         
-        if let price = data.price {
+        if data.price != nil {
             if let sale = data.salePrice {
                 let text = data.priceString
                 let attribute = NSMutableAttributedString(string: text)

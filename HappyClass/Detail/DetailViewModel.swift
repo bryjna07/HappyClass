@@ -43,14 +43,15 @@ final class DetailViewModel: BaseViewModel {
         let errorText = PublishRelay<String>()
         
         input.viewDidLoad
-            .flatMap { [weak self] _ -> Single<Result<Course, ResponseError>> in
+            .flatMap { [weak self] _ -> Single<Result<CourseDTO, ResponseError>> in
                 guard let self else { return .never() }
                     return self.apiService
                     .fetchDataWithResponseError(Router.sesac(.courseDetail(self.classId)))
                 }
             .subscribe(with: self) { owner, result in
                 switch result {
-                case .success(let course):
+                case .success(let dto):
+                    let course = dto.toDomain()
                     data.accept(course)
                     if let images = course.imageURLS {
                         imageList.accept(images)
@@ -62,15 +63,16 @@ final class DetailViewModel: BaseViewModel {
             .disposed(by: disposeBag)
         
         input.viewWillAppear
-            .flatMap { [weak self] _ -> Single<Result<CommentInfo, ResponseError>> in
+            .flatMap { [weak self] _ -> Single<Result<CommentInfoDTO, ResponseError>> in
                 guard let self else { return .never() }
                 return self.apiService.fetchDataWithResponseError(Router.comment(.readComments(self.classId)))
             }
             .subscribe(with: self) { owner, result in
                 switch result {
-                case .success(let data):
-                    commentCount.accept(data.data.count)
-                    commentList.accept(data.data)
+                case .success(let dto):
+                    let list = dto.toDomain().data
+                    commentCount.accept(list.count)
+                    commentList.accept(list)
                 case .failure(let error):
                     errorText.accept(error.userResponse)
                 }

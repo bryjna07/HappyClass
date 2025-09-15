@@ -100,13 +100,13 @@ extension CommentListCell {
     
     func configure(with data: Comment) {
         
-        if let path = data.creator.profileImage {
+        if let path = data.creator.profileImagePath {
             profileImageView.setKFImage(path: path)
         } else {
             profileImageView.image = .noProfile
         }
         
-        nicknameLabel.text = data.creator.nick
+        nicknameLabel.text = data.creator.nickname
         dateLabel.text = DateFormatManager.shared.commentDisplayFormat(dateString: data.createdAt)
         descriptionLabel.text = data.content
         

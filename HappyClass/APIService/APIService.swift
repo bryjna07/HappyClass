@@ -38,7 +38,7 @@ final class APIService {
                     switch response.result {
                     case .success(let value):
                         observer(.success(.success(value)))
-                    case .failure(let error):
+                    case .failure:
                         let code = response.response?.statusCode ?? 500
                         let errorType = LoginError(rawValue: code) ?? .unknwon
                         observer(.success(.failure(errorType)))

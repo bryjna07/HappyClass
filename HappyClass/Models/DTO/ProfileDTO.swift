@@ -8,7 +8,7 @@
 import Foundation
 
 // 로그인 응답 모델
-struct Profile: Decodable {
+struct ProfileDTO: Decodable {
     let userId: String
     let nick: String
     let email: String?

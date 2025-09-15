@@ -1,5 +1,5 @@
 //
-//  CommentInfo.swift
+//  CommentInfoDTO.swift
 //  HappyClass
 //
 //  Created by YoungJin on 9/5/25.
@@ -7,18 +7,18 @@
 
 import Foundation
 
-struct CommentInfo: Decodable {
-    let data: [Comment]
+struct CommentInfoDTO: Decodable {
+    let data: [CommentDTO]
     enum CodingKeys: CodingKey {
         case data
     }
 }
 
-struct Comment: Decodable {
+struct CommentDTO: Decodable {
     let commentId: String
     let content: String
     let createdAt: String
-    let creator : Profile
+    let creator : ProfileDTO
     
     enum CodingKeys: String, CodingKey {
         case commentId = "comment_id"

@@ -7,13 +7,17 @@
 
 import Foundation
 
-// 에러 응답 모델
-struct ResponseMessage: Decodable {
+// 에러 Domain
+struct ResponseMessage {
     let message: String?
     let likeStatus: Bool?
-    
-    enum CodingKeys: String, CodingKey {
-        case message
-        case likeStatus = "like_status"
+}
+
+// 매핑
+extension ResponseDTO {
+    func toDomain() -> ResponseMessage {
+        return ResponseMessage(
+            message: message,
+            likeStatus: likeStatus)
     }
 }

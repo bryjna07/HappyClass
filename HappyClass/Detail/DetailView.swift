@@ -255,11 +255,11 @@ extension DetailView {
     
     func configure(with data: Course) {
         
-        if let path = data.creator.profileImage {
+        if let path = data.creator.profileImagePath {
             profileImageView.setKFImage(path: path)
         }
         
-        nicknameLabel.text = data.creator.nick
+        nicknameLabel.text = data.creator.nickname
  
         placeLabel.text = data.location
         

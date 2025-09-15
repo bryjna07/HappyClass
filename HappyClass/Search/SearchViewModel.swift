@@ -42,15 +42,16 @@ final class SearchViewModel: BaseViewModel {
             }
             .filter { !$0.isEmpty }
             .distinctUntilChanged()
-            .flatMap { [weak self] text -> Single<Result<CoursesInfo, ResponseError>> in
+            .flatMap { [weak self] text -> Single<Result<CoursesInfoDTO, ResponseError>> in
                 guard let self else { return .never() }
                 return self.apiService.fetchDataWithResponseError(Router.sesac(.search(text)))
             }
             .subscribe(with: self) { owner, response in
                 switch response {
-                case .success(let data):
-                    list.accept(data.data)
-                    if data.data.isEmpty {
+                case .success(let dto):
+                    let courseList = dto.toDomain().data
+                    list.accept(courseList)
+                    if courseList.isEmpty {
                         showEmptyView.accept((true, "검색 결과가 없습니다."))
                     } else {
                         showEmptyView.accept((false, nil))
@@ -62,13 +63,13 @@ final class SearchViewModel: BaseViewModel {
             .disposed(by: disposeBag)
         
         input.likeTap
-            .flatMapLatest { [weak self] (id, bool) -> Single<(String, Result<ResponseMessage, ResponseError>)> in
+            .flatMapLatest { [weak self] (id, bool) -> Single<(String, Result<ResponseDTO, ResponseError>)> in
                 guard let self else { return .never() }
                 return self.apiService
                     .fetchDataWithResponseError(Router.sesac(.like(id, bool)))
                     .map { (id, $0) }
             }
-            .flatMapLatest { [weak self] (id, likeResult) -> Single<(String, Result<Course, ResponseError>)> in
+            .flatMapLatest { [weak self] (id, likeResult) -> Single<(String, Result<CourseDTO, ResponseError>)> in
                 guard let self else { return .never() }
                 switch likeResult {
                 case .success:
@@ -82,12 +83,13 @@ final class SearchViewModel: BaseViewModel {
             }
             .subscribe(onNext: { (id, result) in
                 switch result {
-                case .success(let course):
-                        var coursesList = list.value
-                        if let index = coursesList.firstIndex(where: { $0.classId == id }) {
-                            coursesList[index] = course
-                            list.accept(coursesList)
-                        }
+                case .success(let dto):
+                    let course = dto.toDomain()
+                    var coursesList = list.value
+                    if let index = coursesList.firstIndex(where: { $0.id == id }) {
+                        coursesList[index] = course
+                        list.accept(coursesList)
+                    }
                 case .failure(let error):
                     errorText.accept(error.userResponse)
                 }

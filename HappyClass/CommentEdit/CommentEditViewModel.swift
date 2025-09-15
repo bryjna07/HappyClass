@@ -86,13 +86,13 @@ final class CommentEditViewModel: BaseViewModel {
             input.rightButtonTap
                 .withLatestFrom(input.commentText)
                 .distinctUntilChanged()
-                .flatMap { [weak self] text -> Single<Result<Comment, ResponseError>> in
+                .flatMap { [weak self] text -> Single<Result<CommentDTO, ResponseError>> in
                     guard let self else { return .never() }
-                    return self.apiService.fetchDataWithResponseError(Router.comment(.createComments(self.data.classId, text)))
+                    return self.apiService.fetchDataWithResponseError(Router.comment(.createComments(self.data.id, text)))
                 }
                 .subscribe(with: self) { owner, result in
                     switch result {
-                    case .success(let comment):
+                    case .success:
                         reponseResult.accept(true)
                     case .failure(let error):
                         reponseResult.accept(false)
@@ -104,13 +104,13 @@ final class CommentEditViewModel: BaseViewModel {
             input.rightButtonTap
                 .withLatestFrom(input.commentText)
                 .distinctUntilChanged()
-                .flatMap { [weak self] text -> Single<Result<Comment, ResponseError>> in
+                .flatMap { [weak self] text -> Single<Result<CommentDTO, ResponseError>> in
                     guard let self, let comment else { return .never() }
-                    return self.apiService.fetchDataWithResponseError(Router.comment(.updateComments(self.data.classId, comment.commentId, text)))
+                    return self.apiService.fetchDataWithResponseError(Router.comment(.updateComments(self.data.id, comment.id, text)))
                 }
                 .subscribe(with: self) { owner, result in
                     switch result {
-                    case .success(let comment):
+                    case .success:
                         reponseResult.accept(true)
                     case .failure(let error):
                         reponseResult.accept(false)

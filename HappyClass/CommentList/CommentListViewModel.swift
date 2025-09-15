@@ -48,14 +48,15 @@ final class CommentListViewModel: BaseViewModel {
             .disposed(by: disposeBag)
         
         input.viewWillAppear
-            .flatMap { [weak self] data -> Single<Result<CommentInfo, ResponseError>> in
+            .flatMap { [weak self] data -> Single<Result<CommentInfoDTO, ResponseError>> in
                 guard let self else { return .never() }
-                return self.apiService.fetchDataWithResponseError(Router.comment(.readComments(self.course.classId)))
+                return self.apiService.fetchDataWithResponseError(Router.comment(.readComments(self.course.id)))
             }
             .subscribe(with: self) { owner, result in
                 switch result {
-                case .success(let value):
-                    comments.accept(value.data)
+                case .success(let dto):
+                    let commentList = dto.toDomain().data
+                    comments.accept(commentList)
                 case .failure(let error):
                     errorText.accept(error.userResponse)
                 }
@@ -63,14 +64,14 @@ final class CommentListViewModel: BaseViewModel {
             .disposed(by: disposeBag)
         
         input.commentDeleteTap
-            .flatMap { [weak self] data -> Single<Result<ResponseMessage, ResponseError>> in
+            .flatMap { [weak self] data -> Single<Result<ResponseDTO, ResponseError>> in
                 guard let self else { return .never() }
-                return self.apiService.fetchDataWithResponseError(Router.comment(.deleteComments(self.course.classId, data.commentId)))
+                return self.apiService.fetchDataWithResponseError(Router.comment(.deleteComments(self.course.id, data.id)))
             }
             .subscribe(with: self) { owner, result in
                 switch result {
-                case .success(let value):
-                    dump(value)
+                case .success(let dto):
+                    dump(dto)
                 case .failure(let error):
                     course.accept(owner.course) // 댓글 삭제 시 새로고침
                     errorText.accept(error.userResponse)
@@ -79,14 +80,15 @@ final class CommentListViewModel: BaseViewModel {
             .disposed(by: disposeBag)
         
         course
-            .flatMap { [weak self] data -> Single<Result<CommentInfo, ResponseError>> in
+            .flatMap { [weak self] data -> Single<Result<CommentInfoDTO, ResponseError>> in
                 guard let self else { return .never() }
-                return self.apiService.fetchDataWithResponseError(Router.comment(.readComments(data.classId)))
+                return self.apiService.fetchDataWithResponseError(Router.comment(.readComments(data.id)))
             }
             .subscribe(with: self) { owner, result in
                 switch result {
-                case .success(let value):
-                    comments.accept(value.data)
+                case .success(let dto):
+                    let commentList = dto.toDomain().data
+                    comments.accept(commentList)
                 case .failure(let error):
                     print(error.localizedDescription)
                 }

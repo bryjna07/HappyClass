@@ -38,14 +38,15 @@ final class MainViewModel: BaseViewModel {
         let list = BehaviorRelay<[Course]>(value: [])
         
         input.viewDidLoad
-            .flatMap { [weak self] _ -> Single<Result<CoursesInfo, ResponseError>> in
+            .flatMap { [weak self] _ -> Single<Result<CoursesInfoDTO, ResponseError>> in
                 guard let self else { return .never() }
                 return self.apiService.fetchDataWithResponseError(Router.sesac(.courses))
             }
             .subscribe(with: self) { owner, response in
                 switch response {
-                case .success(let data):
-                    list.accept(data.data)
+                case .success(let dto):
+                    let courseList = dto.toDomain().data
+                    list.accept(courseList)
                 case .failure(let error):
                     errorText.accept(error.localizedDescription)
                 }
@@ -81,13 +82,13 @@ final class MainViewModel: BaseViewModel {
         
         // 좋아요 버튼 업데이트
         input.likeTap
-            .flatMapLatest { [weak self] (id, bool) -> Single<(String, Result<ResponseMessage, ResponseError>)> in
+            .flatMapLatest { [weak self] (id, bool) -> Single<(String, Result<ResponseDTO, ResponseError>)> in
                 guard let self else { return .never() }
                 return self.apiService
                     .fetchDataWithResponseError(Router.sesac(.like(id, bool)))
                     .map { (id, $0) }
             }
-            .flatMapLatest { [weak self] (id, likeResult) -> Single<(String, Result<Course, ResponseError>)> in
+            .flatMapLatest { [weak self] (id, likeResult) -> Single<(String, Result<CourseDTO, ResponseError>)> in
                 guard let self else { return .never() }
                 switch likeResult {
                 case .success:
@@ -101,9 +102,10 @@ final class MainViewModel: BaseViewModel {
             }
             .subscribe(onNext: { (id, result) in
                 switch result {
-                case .success(let course):
+                case .success(let dto):
+                    let course = dto.toDomain()
                         var coursesList = list.value
-                        if let index = coursesList.firstIndex(where: { $0.classId == id }) {
+                        if let index = coursesList.firstIndex(where: { $0.id == id }) {
                             coursesList[index] = course
                             list.accept(coursesList)
                         }
