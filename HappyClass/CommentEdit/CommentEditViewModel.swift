@@ -86,7 +86,7 @@ final class CommentEditViewModel: BaseViewModel {
             input.rightButtonTap
                 .withLatestFrom(input.commentText)
                 .distinctUntilChanged()
-                .flatMap { [weak self] text -> Single<Result<CommentDTO, ResponseError>> in
+                .flatMapLatest { [weak self] text -> Single<Result<CommentDTO, ResponseError>> in
                     guard let self else { return .never() }
                     return self.apiService.fetchDataWithResponseError(Router.comment(.createComments(self.data.id, text)))
                 }
@@ -95,7 +95,6 @@ final class CommentEditViewModel: BaseViewModel {
                     case .success:
                         reponseResult.accept(true)
                     case .failure(let error):
-                        reponseResult.accept(false)
                         errorText.accept(error.userResponse)
                     }
                 }
@@ -104,7 +103,7 @@ final class CommentEditViewModel: BaseViewModel {
             input.rightButtonTap
                 .withLatestFrom(input.commentText)
                 .distinctUntilChanged()
-                .flatMap { [weak self] text -> Single<Result<CommentDTO, ResponseError>> in
+                .flatMapLatest { [weak self] text -> Single<Result<CommentDTO, ResponseError>> in
                     guard let self, let comment else { return .never() }
                     return self.apiService.fetchDataWithResponseError(Router.comment(.updateComments(self.data.id, comment.id, text)))
                 }
@@ -113,7 +112,6 @@ final class CommentEditViewModel: BaseViewModel {
                     case .success:
                         reponseResult.accept(true)
                     case .failure(let error):
-                        reponseResult.accept(false)
                         errorText.accept(error.userResponse)
                     }
                 }

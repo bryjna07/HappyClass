@@ -89,8 +89,6 @@ final class CommentEditViewController: BaseViewController {
             .drive(with: self) { owner, value in
                 if value {
                     owner.navigationController?.popViewController(animated: true)
-                } else {
-                    owner.view.makeToast("댓글 업데이트 실패", position: .center)
                 }
             }
             .disposed(by: disposeBag)
@@ -104,7 +102,7 @@ final class CommentEditViewController: BaseViewController {
         
         output.errorMessage
             .drive(with: self) { owner, text in
-                owner.view.makeToast(text, position: .bottom)
+                owner.view.makeToast(text, position: .top)
             }
             .disposed(by: disposeBag)
         

@@ -63,7 +63,7 @@ final class DetailViewModel: BaseViewModel {
             .disposed(by: disposeBag)
         
         input.viewWillAppear
-            .flatMap { [weak self] _ -> Single<Result<CommentInfoDTO, ResponseError>> in
+            .flatMapLatest { [weak self] _ -> Single<Result<CommentInfoDTO, ResponseError>> in
                 guard let self else { return .never() }
                 return self.apiService.fetchDataWithResponseError(Router.comment(.readComments(self.classId)))
             }

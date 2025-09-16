@@ -42,7 +42,7 @@ final class SearchViewModel: BaseViewModel {
             }
             .filter { !$0.isEmpty }
             .distinctUntilChanged()
-            .flatMap { [weak self] text -> Single<Result<CoursesInfoDTO, ResponseError>> in
+            .flatMapLatest { [weak self] text -> Single<Result<CoursesInfoDTO, ResponseError>> in
                 guard let self else { return .never() }
                 return self.apiService.fetchDataWithResponseError(Router.sesac(.search(text)))
             }
